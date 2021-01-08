@@ -80,4 +80,7 @@ public class ControlSnack implements IControlSnack {
         direction = DIRECTION_DOWN;
     }
 
+    public Snack getSnack() {
+        return snack;
+    }
 }
