@@ -6,11 +6,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.util.Random;
 
 public class MainActivity extends Activity implements IControlSnackView, IControlGoalView {
     private ControlSnack controlSnack;
@@ -28,6 +29,7 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
 
     private CollGoal collGoal;
     private CollSnack collSnack;
+    private RelativeLayout game_scene;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,19 +46,24 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
 
     }
 
-    private boolean isStart = false;
+    private boolean isFirst = false;
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         System.out.println("onWindowFocusChanged " + hasFocus);
 
+        if (isFirst) {
+            return;
+        }
+
+        isFirst = true;
         gameStart();
     }
 
-
-
     private void initUI() {
+        game_scene = findViewById(R.id.game_scene);
+
         snack_head = findViewById(R.id.snack_head);
 
         dire_up = findViewById(R.id.dire_up);
@@ -99,11 +106,6 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
     }
 
     private void gameStart() {
-        if (isStart) {
-            return;
-        }
-
-        isStart = true;
         // 获取蛇ui
 
         // 按钮事件
@@ -125,27 +127,10 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
         }).start();
 
         // 随机出现一个目标
+        createCollGoal();
 
-        // 目标图片
-        ImageView goalView = new ImageView(this);
-        goalView.setImageResource(R.drawable.goal);
-        goalView.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        goalView.setX(500);
-        goalView.setY(200);
-
-        // 获取游戏场景
-        RelativeLayout game_scene = findViewById(R.id.game_scene);
-
-        // 往容器添加view
-        game_scene.addView(goalView);
-
-        collGoal = new CollGoal();
-        collGoal.setGoal(getControlGoal().getGoal());
-        collGoal.setView(goalView);
-
-        collSnack = new CollSnack();
-        collSnack.setSnack(getControlSnack().getSnack());
-        collSnack.setView(snack_head);
+        // 蛇的碰撞体设置
+        createCollSnack();
 
         // 碰撞检测线程
         new Thread(new Runnable() {
@@ -154,7 +139,7 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
                 while (true) {
                     mCollHandler.sendEmptyMessage(0);
                     try {
-                        Thread.sleep(500);
+                        Thread.sleep(100);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -162,6 +147,32 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
             }
         }).start();
 
+    }
+
+    private void createCollSnack() {
+        collSnack = new CollSnack();
+        collSnack.setSnack(getControlSnack().getSnack());
+        collSnack.setView(snack_head);
+    }
+
+    Random random = new Random();
+
+    private void createCollGoal() {
+        // 目标图片
+        ImageView goalView = new ImageView(this);
+        goalView.setImageResource(R.drawable.goal);
+        goalView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        goalView.setX(random.nextInt(500) + 50);
+        goalView.setY(random.nextInt(300) + 50);
+
+        // 往容器添加view
+        game_scene.addView(goalView);
+
+        // 碰撞目标 设置
+
+        collGoal = new CollGoal();
+        collGoal.setGoal(getControlGoal().getGoal());
+        collGoal.setView(goalView);
     }
 
     private void initControlSnack() {
@@ -231,14 +242,37 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
     }
 
     private class CollHandler extends Handler {
+        boolean flag = false;
+
         @Override
-        public void handleMessage(Message msg) {
+        synchronized public void handleMessage(Message msg) {
             // if (相撞) -> 目标消失，重新随机出现
-            System.out.println("snack:" + collSnack.getRect());
-            System.out.println("goal:" + collGoal.getRect());
-            if (collSnack.isColl(collGoal)) {
-                System.out.println("相撞");
+//            System.out.println("snack:" + collSnack.getRect());
+//            System.out.println("goal:" + collGoal.getRect());
+
+            if (collSnack == null || collGoal == null) {
+                return;
             }
+
+            if (flag == true)
+                return;
+
+            if (collSnack.isColl(collGoal)) {
+                flag = true;
+                System.out.println("相撞");
+                game_scene.removeView(collGoal.getView());
+
+                collGoal = null;
+                getControlGoal().unRegisterGoal();
+                Goal goal = new Goal();
+                goal.setName("目标-" + ++GameData.GOAL_COUNT);
+                getControlGoal().registerGoal(goal);
+
+                createCollGoal();
+
+                flag = false;
+            }
+
 
         }
     }

@@ -38,7 +38,7 @@ public class CollGoal implements ICollision {
     }
 
     @Override
-    public boolean isColl(ICollision obj) {
+    synchronized public boolean isColl(ICollision obj) {
         if (getRect().intersect(obj.getRect())) {
             return true;
         }

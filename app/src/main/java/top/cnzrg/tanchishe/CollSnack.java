@@ -59,7 +59,7 @@ public class CollSnack implements ICollision {
     }
 
     @Override
-    public boolean isColl(ICollision obj) {
+    synchronized public boolean isColl(ICollision obj) {
         if (getRect().intersect(obj.getRect())) {
             return true;
         }
