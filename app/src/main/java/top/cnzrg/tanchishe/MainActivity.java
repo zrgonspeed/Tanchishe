@@ -217,43 +217,76 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
 
     @Override
     public void turnUP() {
+        System.out.println("DIRECTION_UP");
 
+        int newY = (int) (snack_head.getY() - GameData.SNACK_MOVE_DIST_INTERVAL);
+        if (newY <= 0) {
+            System.out.println("game over DIRECTION_UP");
+            newY = 0;
+        }
+//                collSnackHead.setY(newY);
+        collSnackHead.setXY(collSnackHead.getView().getX(), newY);
     }
 
     @Override
     public void turnLeft() {
+        System.out.println("DIRECTION_LEFT");
 
+        int newX = (int) (snack_head.getX() - GameData.SNACK_MOVE_DIST_INTERVAL);
+        if (newX <= 0) {
+            System.out.println("game over DIRECTION_LEFT");
+            newX = 0;
+        }
+//                collSnackHead.setX(newX);
+        collSnackHead.setXY(newX, collSnackHead.getView().getY());
     }
 
     @Override
     public void turnRight() {
-        System.out.println("往右");
+        System.out.println("DIRECTION_RIGHT");
+
+        int newX = (int) (snack_head.getX() + GameData.SNACK_MOVE_DIST_INTERVAL);
+        if (newX >= GameData.SCENE_WIDTH - collSnackHead.getView().getWidth()) {
+            System.out.println("game over DIRECTION_RIGHT");
+            newX = GameData.SCENE_WIDTH - collSnackHead.getView().getWidth();
+        }
+//                collSnackHead.setX(newX);
+        collSnackHead.setXY(newX, collSnackHead.getView().getY());
     }
 
     @Override
     public void turnDown() {
+        System.out.println("DIRECTION_DOWN");
 
+        int newY = (int) (snack_head.getY() + GameData.SNACK_MOVE_DIST_INTERVAL);
+        if (newY >= GameData.SCENE_HEIGHT - collSnackHead.getView().getHeight()) {
+            System.out.println("game over DIRECTION_DOWN");
+            newY = GameData.SCENE_HEIGHT - collSnackHead.getView().getHeight();
+        }
+//                collSnackHead.setY(newY);
+        collSnackHead.setXY(collSnackHead.getView().getX(), newY);
     }
+
+    private int lastDire = 0;
 
     class RunHandler extends Handler {
         @Override
         synchronized public void handleMessage(Message msg) {
             // 当前图片四条边处于边界上时，就不移动， game over
 
+
             if (msg.what == Direction.DIRECTION_UP) {
                 if (collSnackHead.getView().getY() <= 0) {
                     return;
                 }
 
-                System.out.println("DIRECTION_UP");
-
-                int newY = (int) (snack_head.getY() - GameData.SNACK_MOVE_DIST_INTERVAL);
-                if (newY <= 0) {
-                    System.out.println("game over DIRECTION_UP");
-                    newY = 0;
+                if (lastDire == Direction.DIRECTION_DOWN) {
+                    turnDown();
+                    return;
                 }
-//                collSnackHead.setY(newY);
-                collSnackHead.setXY(collSnackHead.getView().getX(), newY);
+
+                turnUP();
+
             }
 
             if (msg.what == Direction.DIRECTION_RIGHT) {
@@ -261,15 +294,12 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
                     return;
                 }
 
-                System.out.println("DIRECTION_RIGHT");
-
-                int newX = (int) (snack_head.getX() + GameData.SNACK_MOVE_DIST_INTERVAL);
-                if (newX >= GameData.SCENE_WIDTH - collSnackHead.getView().getWidth()) {
-                    System.out.println("game over DIRECTION_RIGHT");
-                    newX = GameData.SCENE_WIDTH - collSnackHead.getView().getWidth();
+                if (lastDire == Direction.DIRECTION_LEFT) {
+                    turnLeft();
+                    return;
                 }
-//                collSnackHead.setX(newX);
-                collSnackHead.setXY(newX, collSnackHead.getView().getY());
+
+                turnRight();
             }
 
             if (msg.what == Direction.DIRECTION_DOWN) {
@@ -277,15 +307,12 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
                     return;
                 }
 
-                System.out.println("DIRECTION_DOWN");
-
-                int newY = (int) (snack_head.getY() + GameData.SNACK_MOVE_DIST_INTERVAL);
-                if (newY >= GameData.SCENE_HEIGHT - collSnackHead.getView().getHeight()) {
-                    System.out.println("game over DIRECTION_DOWN");
-                    newY = GameData.SCENE_HEIGHT - collSnackHead.getView().getHeight();
+                if (lastDire == Direction.DIRECTION_UP) {
+                    turnUP();
+                    return;
                 }
-//                collSnackHead.setY(newY);
-                collSnackHead.setXY(collSnackHead.getView().getX(), newY);
+
+                turnDown();
             }
 
             if (msg.what == Direction.DIRECTION_LEFT) {
@@ -293,23 +320,22 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
                     return;
                 }
 
-                System.out.println("DIRECTION_LEFT");
-
-                int newX = (int) (snack_head.getX() - GameData.SNACK_MOVE_DIST_INTERVAL);
-                if (newX <= 0) {
-                    System.out.println("game over DIRECTION_LEFT");
-                    newX = 0;
+                if (lastDire == Direction.DIRECTION_RIGHT) {
+                    turnRight();
+                    return;
                 }
-//                collSnackHead.setX(newX);
-                collSnackHead.setXY(newX, collSnackHead.getView().getY());
+
+                turnLeft();
             }
 
+            lastDire = msg.what;
         }
     }
 
     private class CollHandler extends Handler {
         boolean flag = false;
         int a = 0;
+
         @Override
         synchronized public void handleMessage(Message msg) {
             // if (相撞) -> 目标消失，重新随机出现
@@ -370,7 +396,7 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
 
                 body.setView(bodyView);
 
-                if(lastBody == null) {
+                if (lastBody == null) {
                     lastBody = body;
                 }
 
