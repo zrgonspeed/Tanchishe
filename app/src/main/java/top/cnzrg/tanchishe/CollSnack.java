@@ -41,16 +41,13 @@ public class CollSnack implements ICollision {
         lastY = view.getY();
     }
 
-    public synchronized void setX(float x) {
-        boolean flag = false;
-        if (lastY != view.getY()) {
-            flag = true;
-        }
-
+    public void setXY(float x, float y) {
         lastX = view.getX();
         lastY = view.getY();
 
         view.setX(x);
+        view.setY(y);
+
         rect.left = (int) (x);
         rect.right = (int) (x + view.getWidth());
         rect.top = (int) (view.getY());
@@ -60,46 +57,8 @@ public class CollSnack implements ICollision {
             return;
         }
 
-        // 身体跟着运动
-//        next.setX(lastX);
-//        next.setY(lastY);
+        next.setXY(lastX, lastY);
 
-        if (flag) {
-            next.setX(lastX);
-            next.setY(lastY);
-        } else {
-            next.setX(lastX);
-        }
-    }
-
-    public synchronized void setY(float y) {
-        boolean flag = false;
-        if (lastX != view.getX()) {
-            flag = true;
-        }
-        lastX = view.getX();
-        lastY = view.getY();
-
-        view.setY(y);
-        rect.top = (int) (y);
-        rect.bottom = (int) (y + view.getHeight());
-        rect.left = (int) (view.getX());
-        rect.right = (int) (view.getX() + view.getWidth());
-
-        if (next == null) {
-            return;
-        }
-
-
-        // 身体跟着运动
-//        next.setX(lastX);
-
-        if (flag) {
-            next.setY(lastY);
-            next.setX(lastX);
-        } else {
-            next.setY(lastY);
-        }
     }
 
     public String getName() {

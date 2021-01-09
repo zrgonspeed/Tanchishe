@@ -252,7 +252,8 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
                     System.out.println("game over DIRECTION_UP");
                     newY = 0;
                 }
-                collSnackHead.setY(newY);
+//                collSnackHead.setY(newY);
+                collSnackHead.setXY(collSnackHead.getView().getX(), newY);
             }
 
             if (msg.what == Direction.DIRECTION_RIGHT) {
@@ -267,7 +268,8 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
                     System.out.println("game over DIRECTION_RIGHT");
                     newX = GameData.SCENE_WIDTH - collSnackHead.getView().getWidth();
                 }
-                collSnackHead.setX(newX);
+//                collSnackHead.setX(newX);
+                collSnackHead.setXY(newX, collSnackHead.getView().getY());
             }
 
             if (msg.what == Direction.DIRECTION_DOWN) {
@@ -282,7 +284,8 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
                     System.out.println("game over DIRECTION_DOWN");
                     newY = GameData.SCENE_HEIGHT - collSnackHead.getView().getHeight();
                 }
-                collSnackHead.setY(newY);
+//                collSnackHead.setY(newY);
+                collSnackHead.setXY(collSnackHead.getView().getX(), newY);
             }
 
             if (msg.what == Direction.DIRECTION_LEFT) {
@@ -297,7 +300,8 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
                     System.out.println("game over DIRECTION_LEFT");
                     newX = 0;
                 }
-                collSnackHead.setX(newX);
+//                collSnackHead.setX(newX);
+                collSnackHead.setXY(newX, collSnackHead.getView().getY());
             }
 
         }
