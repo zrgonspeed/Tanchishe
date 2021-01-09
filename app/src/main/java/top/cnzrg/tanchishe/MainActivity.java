@@ -2,9 +2,11 @@ package top.cnzrg.tanchishe;
 
 
 import android.app.Activity;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -56,8 +58,20 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
         if (isFirst) {
             return;
         }
-
         isFirst = true;
+
+        // 屏幕宽高获取
+        DisplayMetrics metric = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getRealMetrics(metric);
+        int width = metric.widthPixels; // 宽度（PX）
+        int height = metric.heightPixels; // 高度（PX）
+
+        GameData.SCENE_HEIGHT = height;
+        GameData.SCENE_WIDTH = width;
+
+        System.out.println("SCENE_HEIGHT " + height);
+        System.out.println("SCENE_WIDTH " + width);
+
         gameStart();
     }
 
@@ -118,7 +132,7 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
                 while (true) {
                     mRunHandler.sendEmptyMessage(controlSnack.getDirection());
                     try {
-                        Thread.sleep(1000);
+                        Thread.sleep(GameData.SNACK_MOVE_TIME_INTERVAL);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -139,7 +153,7 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
                 while (true) {
                     mCollHandler.sendEmptyMessage(0);
                     try {
-                        Thread.sleep(100);
+                        Thread.sleep(GameData.COLL_GOAL_TIME_INTERVAL);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -162,17 +176,19 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
         ImageView goalView = new ImageView(this);
         goalView.setImageResource(R.drawable.goal);
         goalView.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        goalView.setX(random.nextInt(500) + 50);
-        goalView.setY(random.nextInt(300) + 50);
+        goalView.setX(random.nextInt(GameData.SCENE_WIDTH - goalView.getWidth() + 1));
+        goalView.setY(random.nextInt(GameData.SCENE_HEIGHT - goalView.getHeight() + 1));
 
         // 往容器添加view
         game_scene.addView(goalView);
 
         // 碰撞目标 设置
-
         collGoal = new CollGoal();
         collGoal.setGoal(getControlGoal().getGoal());
         collGoal.setView(goalView);
+
+        System.out.println("目标生成:" + collGoal.getName());
+        System.out.println("goalView:" + goalView.getX() + " - " + goalView.getY());
     }
 
     private void initControlSnack() {
@@ -221,21 +237,58 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
 
     class RunHandler extends Handler {
         @Override
-        public void handleMessage(Message msg) {
+        synchronized public void handleMessage(Message msg) {
+            // 当前图片四条边处于边界上时，就不移动， game over
+
             if (msg.what == Direction.DIRECTION_UP) {
-                collSnack.setY(snack_head.getY() - 50);
+                if (collSnack.getView().getY() <= 0) {
+                    return;
+                }
+
+                int newY = (int) (snack_head.getY() - GameData.SNACK_MOVE_DIST_INTERVAL);
+                if (newY <= 0) {
+                    System.out.println("game over DIRECTION_UP");
+                    newY = 0;
+                }
+                collSnack.setY(newY);
             }
 
             if (msg.what == Direction.DIRECTION_RIGHT) {
-                collSnack.setX(snack_head.getX() + 50);
+                if (collSnack.getView().getX() >= GameData.SCENE_WIDTH - collSnack.getView().getWidth()) {
+                    return;
+                }
+                int newX = (int) (snack_head.getX() + GameData.SNACK_MOVE_DIST_INTERVAL);
+                if (newX >= GameData.SCENE_WIDTH - collSnack.getView().getWidth()) {
+                    System.out.println("game over DIRECTION_RIGHT");
+                    newX = GameData.SCENE_WIDTH - collSnack.getView().getWidth();
+                }
+                collSnack.setX(newX);
             }
 
             if (msg.what == Direction.DIRECTION_DOWN) {
-                collSnack.setY(snack_head.getY() + 50);
+                if (collSnack.getView().getY() >= GameData.SCENE_HEIGHT - collSnack.getView().getHeight()) {
+                    return;
+                }
+
+                int newY = (int) (snack_head.getY() + GameData.SNACK_MOVE_DIST_INTERVAL);
+                if (newY >= GameData.SCENE_HEIGHT - collSnack.getView().getHeight()) {
+                    System.out.println("game over DIRECTION_DOWN");
+                    newY = GameData.SCENE_HEIGHT - collSnack.getView().getHeight();
+                }
+                collSnack.setY(newY);
             }
 
             if (msg.what == Direction.DIRECTION_LEFT) {
-                collSnack.setX(snack_head.getX() - 50);
+                if (collSnack.getView().getX() <= 0) {
+                    return;
+                }
+
+                int newX = (int) (snack_head.getX() - GameData.SNACK_MOVE_DIST_INTERVAL);
+                if (newX <= 0) {
+                    System.out.println("game over DIRECTION_LEFT");
+                    newX = 0;
+                }
+                collSnack.setX(newX);
             }
 
         }
@@ -247,12 +300,14 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
         @Override
         synchronized public void handleMessage(Message msg) {
             // if (相撞) -> 目标消失，重新随机出现
-//            System.out.println("snack:" + collSnack.getRect());
-//            System.out.println("goal:" + collGoal.getRect());
+
 
             if (collSnack == null || collGoal == null) {
                 return;
             }
+
+            //            System.out.println("snack:" + collSnack.getRect());
+//            System.out.println("goal:" + collGoal.getRect());
 
             if (flag == true)
                 return;
