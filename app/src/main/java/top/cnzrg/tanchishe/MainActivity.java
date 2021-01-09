@@ -2,7 +2,6 @@ package top.cnzrg.tanchishe;
 
 
 import android.app.Activity;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -30,7 +29,8 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
     private Handler mCollHandler;
 
     private CollGoal collGoal;
-    private CollSnack collSnack;
+    private CollSnack collSnackHead;
+    private CollSnack lastBody;
     private RelativeLayout game_scene;
 
     @Override
@@ -164,9 +164,9 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
     }
 
     private void createCollSnack() {
-        collSnack = new CollSnack();
-        collSnack.setSnack(getControlSnack().getSnack());
-        collSnack.setView(snack_head);
+        collSnackHead = new CollSnack();
+        collSnackHead.setSnack(getControlSnack().getSnack());
+        collSnackHead.setView(snack_head);
     }
 
     Random random = new Random();
@@ -241,54 +241,63 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
             // 当前图片四条边处于边界上时，就不移动， game over
 
             if (msg.what == Direction.DIRECTION_UP) {
-                if (collSnack.getView().getY() <= 0) {
+                if (collSnackHead.getView().getY() <= 0) {
                     return;
                 }
+
+                System.out.println("DIRECTION_UP");
 
                 int newY = (int) (snack_head.getY() - GameData.SNACK_MOVE_DIST_INTERVAL);
                 if (newY <= 0) {
                     System.out.println("game over DIRECTION_UP");
                     newY = 0;
                 }
-                collSnack.setY(newY);
+                collSnackHead.setY(newY);
             }
 
             if (msg.what == Direction.DIRECTION_RIGHT) {
-                if (collSnack.getView().getX() >= GameData.SCENE_WIDTH - collSnack.getView().getWidth()) {
+                if (collSnackHead.getView().getX() >= GameData.SCENE_WIDTH - collSnackHead.getView().getWidth()) {
                     return;
                 }
+
+                System.out.println("DIRECTION_RIGHT");
+
                 int newX = (int) (snack_head.getX() + GameData.SNACK_MOVE_DIST_INTERVAL);
-                if (newX >= GameData.SCENE_WIDTH - collSnack.getView().getWidth()) {
+                if (newX >= GameData.SCENE_WIDTH - collSnackHead.getView().getWidth()) {
                     System.out.println("game over DIRECTION_RIGHT");
-                    newX = GameData.SCENE_WIDTH - collSnack.getView().getWidth();
+                    newX = GameData.SCENE_WIDTH - collSnackHead.getView().getWidth();
                 }
-                collSnack.setX(newX);
+                collSnackHead.setX(newX);
             }
 
             if (msg.what == Direction.DIRECTION_DOWN) {
-                if (collSnack.getView().getY() >= GameData.SCENE_HEIGHT - collSnack.getView().getHeight()) {
+                if (collSnackHead.getView().getY() >= GameData.SCENE_HEIGHT - collSnackHead.getView().getHeight()) {
                     return;
                 }
 
+                System.out.println("DIRECTION_DOWN");
+
                 int newY = (int) (snack_head.getY() + GameData.SNACK_MOVE_DIST_INTERVAL);
-                if (newY >= GameData.SCENE_HEIGHT - collSnack.getView().getHeight()) {
+                if (newY >= GameData.SCENE_HEIGHT - collSnackHead.getView().getHeight()) {
                     System.out.println("game over DIRECTION_DOWN");
-                    newY = GameData.SCENE_HEIGHT - collSnack.getView().getHeight();
+                    newY = GameData.SCENE_HEIGHT - collSnackHead.getView().getHeight();
                 }
-                collSnack.setY(newY);
+                collSnackHead.setY(newY);
             }
 
             if (msg.what == Direction.DIRECTION_LEFT) {
-                if (collSnack.getView().getX() <= 0) {
+                if (collSnackHead.getView().getX() <= 0) {
                     return;
                 }
+
+                System.out.println("DIRECTION_LEFT");
 
                 int newX = (int) (snack_head.getX() - GameData.SNACK_MOVE_DIST_INTERVAL);
                 if (newX <= 0) {
                     System.out.println("game over DIRECTION_LEFT");
                     newX = 0;
                 }
-                collSnack.setX(newX);
+                collSnackHead.setX(newX);
             }
 
         }
@@ -296,13 +305,13 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
 
     private class CollHandler extends Handler {
         boolean flag = false;
-
+        int a = 0;
         @Override
         synchronized public void handleMessage(Message msg) {
             // if (相撞) -> 目标消失，重新随机出现
 
 
-            if (collSnack == null || collGoal == null) {
+            if (collSnackHead == null || collGoal == null) {
                 return;
             }
 
@@ -312,7 +321,7 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
             if (flag == true)
                 return;
 
-            if (collSnack.isColl(collGoal)) {
+            if (collSnackHead.isColl(collGoal)) {
                 flag = true;
                 System.out.println("相撞");
                 game_scene.removeView(collGoal.getView());
@@ -324,6 +333,49 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
                 getControlGoal().registerGoal(goal);
 
                 createCollGoal();
+
+                // 蛇身增加一块
+                CollSnack body = new CollSnack();
+                // snack实体还是通用
+                body.setSnack(getControlSnack().getSnack());
+
+                int[] arr = {
+                        R.drawable.body1,
+                        R.drawable.body2,
+                        R.drawable.body3,
+                        R.drawable.body4,
+                        R.drawable.body5,
+                        R.drawable.body6,
+                        R.drawable.body7,
+                        R.drawable.body8,
+                };
+
+
+                // 身体图片
+                ImageView bodyView = new ImageView(MainActivity.this);
+                bodyView.setImageResource(arr[a++]);
+                bodyView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                if (lastBody == null) {
+                    bodyView.setX(collSnackHead.getLastX());
+                    bodyView.setY(collSnackHead.getLastY());
+                } else {
+                    bodyView.setX(lastBody.getLastX());
+                    bodyView.setY(lastBody.getLastY());
+                }
+                game_scene.addView(bodyView);
+
+                body.setView(bodyView);
+
+                if(lastBody == null) {
+                    lastBody = body;
+                }
+
+                if (collSnackHead.nextBody() == null) {
+                    collSnackHead.addBody(body);
+                } else {
+                    lastBody.addBody(body);
+                    lastBody = body;
+                }
 
                 flag = false;
             }

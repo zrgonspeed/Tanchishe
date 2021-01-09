@@ -7,6 +7,9 @@ import android.util.AttributeSet;
 import android.widget.ImageView;
 
 public class CollSnack implements ICollision {
+
+    public float lastX;
+    public float lastY;
     private Snack snack;
     private ImageView view;
     private Rect rect;
@@ -23,27 +26,81 @@ public class CollSnack implements ICollision {
         return view;
     }
 
+    public float getLastX() {
+        return lastX;
+    }
+
+    public float getLastY() {
+        return lastY;
+    }
+
     public void setView(ImageView view) {
         this.view = view;
         this.rect = new Rect((int) (view.getX()), (int) (view.getY()), (int) (view.getX() + view.getWidth()), (int) (view.getY() + view.getHeight()));
+        lastX = view.getX();
+        lastY = view.getY();
     }
 
-    public void setX(float x) {
+    public synchronized void setX(float x) {
+        boolean flag = false;
+        if (lastY != view.getY()) {
+            flag = true;
+        }
+
+        lastX = view.getX();
+        lastY = view.getY();
+
         view.setX(x);
         rect.left = (int) (x);
         rect.right = (int) (x + view.getWidth());
         rect.top = (int) (view.getY());
         rect.bottom = (int) (view.getY() + view.getHeight());
+
+        if (next == null) {
+            return;
+        }
+
+        // 身体跟着运动
+//        next.setX(lastX);
+//        next.setY(lastY);
+
+        if (flag) {
+            next.setX(lastX);
+            next.setY(lastY);
+        } else {
+            next.setX(lastX);
+        }
     }
 
-    public void setY(float y) {
+    public synchronized void setY(float y) {
+        boolean flag = false;
+        if (lastX != view.getX()) {
+            flag = true;
+        }
+        lastX = view.getX();
+        lastY = view.getY();
+
         view.setY(y);
         rect.top = (int) (y);
         rect.bottom = (int) (y + view.getHeight());
         rect.left = (int) (view.getX());
         rect.right = (int) (view.getX() + view.getWidth());
-    }
 
+        if (next == null) {
+            return;
+        }
+
+
+        // 身体跟着运动
+//        next.setX(lastX);
+
+        if (flag) {
+            next.setY(lastY);
+            next.setX(lastX);
+        } else {
+            next.setY(lastY);
+        }
+    }
 
     public String getName() {
         return snack.getName() + "-col";
@@ -64,5 +121,16 @@ public class CollSnack implements ICollision {
             return true;
         }
         return false;
+    }
+
+    private CollSnack next;
+
+    public void addBody(CollSnack collSnack) {
+        this.next = collSnack;
+        snack.setLen(snack.getLen() + 1);
+    }
+
+    public CollSnack nextBody() {
+        return this.next;
     }
 }
