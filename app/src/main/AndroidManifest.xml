@@ -8,7 +8,7 @@
         android:label="贪吃蛇"
         android:screenOrientation="landscape"
         android:icon="@drawable/shetou"
-        android:theme="@style/Theme.AppCompat.DayNight">
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
