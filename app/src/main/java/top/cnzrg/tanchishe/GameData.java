@@ -17,5 +17,6 @@ public class GameData {
 
     public static int SNACK_WIDTH_HEIGHT = 100;
     public static int SNACK_BODY_WIDTH_HEIGHT = 100;
+    public static int GOAL_WIDTH_HEIGHT = 100;
 
 }

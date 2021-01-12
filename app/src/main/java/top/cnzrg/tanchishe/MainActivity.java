@@ -17,6 +17,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.security.SecureRandom;
 import java.util.Random;
 
 import top.cnzrg.tanchishe.util.ToastUtil;
@@ -281,15 +282,17 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
         collSnackHead.setView(snack_head);
     }
 
-    Random random = new Random();
+    SecureRandom random = new SecureRandom();
 
     private void createCollGoal() {
         // 目标图片
         ImageView goalView = new ImageView(this);
         goalView.setImageResource(R.drawable.goal);
         goalView.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        goalView.setX(random.nextInt(GameData.SCENE_WIDTH - goalView.getWidth() + 1));
-        goalView.setY(random.nextInt(GameData.SCENE_HEIGHT - goalView.getHeight() + 1));
+        goalView.setX(random.nextInt(GameData.SCENE_WIDTH - GameData.GOAL_WIDTH_HEIGHT + 1));
+        goalView.setY(random.nextInt(GameData.SCENE_HEIGHT - GameData.GOAL_WIDTH_HEIGHT + 1));
+
+        goalView.setLayoutParams(new ConstraintLayout.LayoutParams(GameData.GOAL_WIDTH_HEIGHT, GameData.GOAL_WIDTH_HEIGHT));
 
         // 往容器添加view
         game_scene.addView(goalView);
