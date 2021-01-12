@@ -8,14 +8,18 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.Random;
+
+import top.cnzrg.tanchishe.util.ToastUtil;
 
 public class MainActivity extends Activity implements IControlSnackView, IControlGoalView {
     private ControlSnack controlSnack;
@@ -58,17 +62,17 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
 
     }
 
-    private boolean isFirst = false;
+    private boolean isFirst = true;
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         System.out.println("onWindowFocusChanged " + hasFocus);
 
-        if (isFirst) {
+        if (!isFirst) {
             return;
         }
-        isFirst = true;
+        isFirst = false;
 
         // 屏幕宽高获取
         DisplayMetrics metric = new DisplayMetrics();
@@ -81,8 +85,39 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
 
         System.out.println("SCENE_HEIGHT " + height);
         System.out.println("SCENE_WIDTH " + width);
+        ToastUtil.showLong(this, "H " + height + " W " + width + " S " + snack_head.getWidth());
 
         gameStart();
+
+        // 网格线添加
+        addGridLine();
+    }
+
+    public void addGridLine() {
+        int bianchang = 50;
+        // 横线
+        for (int i = 0; i < GameData.SCENE_HEIGHT / bianchang + 1; i++) {
+            View v = new View(this);
+            v.setBackgroundColor(getResources().getColor(R.color.black));
+            ConstraintLayout.LayoutParams layoutParams = new ConstraintLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 1);
+            layoutParams.topMargin = bianchang * i;
+            layoutParams.topToTop = R.id.game_scene;
+            v.setLayoutParams(layoutParams);
+
+            game_scene.addView(v);
+        }
+
+        // 竖线
+        for (int i = 0; i < GameData.SCENE_WIDTH / bianchang + 1; i++) {
+            View v = new View(this);
+            v.setBackgroundColor(getResources().getColor(R.color.black));
+            ConstraintLayout.LayoutParams layoutParams = new ConstraintLayout.LayoutParams(1, ViewGroup.LayoutParams.MATCH_PARENT);
+            layoutParams.leftMargin = bianchang * i;
+            layoutParams.startToStart = R.id.game_scene;
+            v.setLayoutParams(layoutParams);
+
+            game_scene.addView(v);
+        }
     }
 
     private void initUI() {
@@ -94,6 +129,7 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
         dire_right = findViewById(R.id.dire_right);
         dire_down = findViewById(R.id.dire_down);
         dire_left = findViewById(R.id.dire_left);
+
     }
 
     private void initListener() {
@@ -395,6 +431,10 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
                 ImageView bodyView = new ImageView(MainActivity.this);
                 bodyView.setImageResource(arr[a++]);
                 bodyView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+
+                // 设置身体图片宽高
+                bodyView.setLayoutParams(new RelativeLayout.LayoutParams(GameData.SNACK_BODY_WIDTH_HEIGHT, GameData.SNACK_BODY_WIDTH_HEIGHT));
+
                 if (lastBody == null) {
                     bodyView.setX(collSnackHead.getLastX());
                     bodyView.setY(collSnackHead.getLastY());

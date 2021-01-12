@@ -6,10 +6,140 @@
     android:layout_height="match_parent"
     android:background="#BFBFBF">
 
+    <!--<View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="#000000" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_marginTop="100px"
+        android:background="#000000"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_marginTop="200px"
+        android:background="#000000"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_marginTop="300px"
+        android:background="#000000"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_marginTop="400px"
+        android:background="#000000"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_marginTop="500px"
+        android:background="#000000"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_marginTop="600px"
+        android:background="#000000"
+        app:layout_constraintTop_toTopOf="parent" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_marginTop="700px"
+        android:background="#000000"
+        app:layout_constraintTop_toTopOf="parent" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_marginTop="800px"
+        android:background="#000000"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:layout_width="1px"
+        android:layout_height="match_parent"
+        android:background="#000000" />
+
+    <View
+        android:layout_width="1px"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="100px"
+        android:background="#000000" />
+
+    <View
+        android:layout_width="1px"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="200px"
+        android:background="#000000" />
+    <View
+        android:layout_width="1px"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="300px"
+        android:background="#000000" />
+    <View
+        android:layout_width="1px"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="400px"
+        android:background="#000000" />
+
+    <View
+        android:layout_width="1px"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="500px"
+        android:background="#000000" />
+    <View
+        android:layout_width="1px"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="600px"
+        android:background="#000000" />
+    <View
+        android:layout_width="1px"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="700px"
+        android:background="#000000" />
+
+    <View
+        android:layout_width="1px"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="800px"
+        android:background="#000000" />
+
+    <View
+        android:layout_width="1px"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="900px"
+        android:background="#000000" />
+
+    <View
+        android:layout_width="1px"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="1000px"
+        android:background="#000000" />-->
+
     <ImageView
         android:id="@+id/snack_head"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="48px"
+        android:layout_height="48px"
         android:background="@drawable/shetou"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
