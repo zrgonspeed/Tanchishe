@@ -138,8 +138,8 @@
 
     <ImageView
         android:id="@+id/snack_head"
-        android:layout_width="48px"
-        android:layout_height="48px"
+        android:layout_width="100px"
+        android:layout_height="100px"
         android:background="@drawable/shetou"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

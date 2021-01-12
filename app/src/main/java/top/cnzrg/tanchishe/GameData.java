@@ -5,11 +5,13 @@ public class GameData {
     public static int SCENE_HEIGHT = 0;
     public static int SCENE_WIDTH = 0;
 
+    public static int GRID_LINE_LEN = 100;
+
     public static int SNACK_MOVE_TIME_INTERVAL = 400;
-    public static int SNACK_MOVE_DIST_INTERVAL = 50;
+    public static int SNACK_MOVE_DIST_INTERVAL = 100;
     public static int COLL_GOAL_TIME_INTERVAL = 50;
 
-    public static int SNACK_WIDTH_HEIGHT = 50;
-    public static int SNACK_BODY_WIDTH_HEIGHT = 50;
+    public static int SNACK_WIDTH_HEIGHT = 100;
+    public static int SNACK_BODY_WIDTH_HEIGHT = 100;
 
 }

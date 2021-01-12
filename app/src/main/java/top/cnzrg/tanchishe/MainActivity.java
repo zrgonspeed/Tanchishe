@@ -94,7 +94,7 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
     }
 
     public void addGridLine() {
-        int bianchang = 50;
+        int bianchang = GameData.GRID_LINE_LEN;
         // 横线
         for (int i = 0; i < GameData.SCENE_HEIGHT / bianchang + 1; i++) {
             View v = new View(this);
