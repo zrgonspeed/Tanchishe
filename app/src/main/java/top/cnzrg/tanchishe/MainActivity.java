@@ -40,6 +40,7 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
     private CollSnack lastBody;
     private ConstraintLayout game_scene;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,6 +61,52 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
 
         initListener();
 
+    }
+
+    @Override
+    protected void onResume() {
+        System.out.println("onResume()-----------------------");
+        // TODO: 2021/1/12
+        gameResume();
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        gamePause();
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+
+        gamePause();
+
+        gameQuit();
+
+        // 释放资源
+        mCollHandler.removeCallbacksAndMessages(null);
+        mRunHandler.removeCallbacksAndMessages(null);
+
+        super.onDestroy();
+    }
+
+    private void gamePause() {
+        System.out.println("gamePause");
+        gameStatus = GameData.STATUS_PAUSE;
+    }
+
+    private void gameResume() {
+        System.out.println("gameResume");
+        gameStatus = GameData.STATUS_RUNNING;
+    }
+
+    private void gameQuit() {
+        System.out.println("gameQuit");
+        gameStatus = GameData.STATUS_STOP;
+        isRunning = false;
+        collDetectThread = null;
+        snackRunThread = null;
     }
 
     private boolean isFirst = true;
@@ -165,48 +212,67 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
         });
     }
 
-    private void gameStart() {
-        // 获取蛇ui
+    private SnackRunThread snackRunThread;
 
-        // 按钮事件
+    private class SnackRunThread extends Thread {
 
-        // 让蛇自动往一个方向移动
+        @Override
+        public void run() {
+            while (isRunning) {
+                if (gameStatus != GameData.STATUS_RUNNING) {
+                    continue;
+                }
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-                    mRunHandler.sendEmptyMessage(controlSnack.getDirection());
-                    try {
-                        Thread.sleep(GameData.SNACK_MOVE_TIME_INTERVAL);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                mRunHandler.sendEmptyMessage(controlSnack.getDirection());
+                try {
+                    Thread.sleep(GameData.SNACK_MOVE_TIME_INTERVAL);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
-        }).start();
+        }
+    }
 
+    private CollDetectThread collDetectThread;
+
+    private class CollDetectThread extends Thread {
+        @Override
+        public void run() {
+            while (isRunning) {
+                if (gameStatus != GameData.STATUS_RUNNING) {
+                    continue;
+                }
+
+                mCollHandler.sendEmptyMessage(0);
+                try {
+                    Thread.sleep(GameData.COLL_GOAL_TIME_INTERVAL);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private boolean isRunning = false;
+    private int gameStatus = GameData.STATUS_STOP;
+
+    private void gameStart() {
         // 随机出现一个目标
         createCollGoal();
 
         // 蛇的碰撞体设置
         createCollSnack();
 
-        // 碰撞检测线程
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-                    mCollHandler.sendEmptyMessage(0);
-                    try {
-                        Thread.sleep(GameData.COLL_GOAL_TIME_INTERVAL);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }).start();
+        isRunning = true;
+        gameStatus = GameData.STATUS_RUNNING;
 
+        // 蛇运动
+        snackRunThread = new SnackRunThread();
+        snackRunThread.start();
+
+        // 碰撞检测线程
+        collDetectThread = new CollDetectThread();
+        collDetectThread.start();
     }
 
     private void createCollSnack() {

@@ -1,6 +1,10 @@
 package top.cnzrg.tanchishe;
 
 public class GameData {
+    public static final int STATUS_RUNNING = 1;
+    public static final int STATUS_PAUSE = 2;
+    public static final int STATUS_STOP = 3;
+
     public static int GOAL_COUNT = 0;
     public static int SCENE_HEIGHT = 0;
     public static int SCENE_WIDTH = 0;
