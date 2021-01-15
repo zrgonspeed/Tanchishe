@@ -4,11 +4,8 @@ package top.cnzrg.tanchishe;
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.util.DisplayMetrics;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
@@ -18,10 +15,20 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.security.SecureRandom;
 
+import top.cnzrg.tanchishe.goal.CollGoal;
+import top.cnzrg.tanchishe.goal.ControlGoal;
+import top.cnzrg.tanchishe.goal.Goal;
+import top.cnzrg.tanchishe.goal.IControlGoalView;
+import top.cnzrg.tanchishe.param.Direction;
+import top.cnzrg.tanchishe.param.GameData;
+import top.cnzrg.tanchishe.snack.CollSnack;
+import top.cnzrg.tanchishe.snack.ControlSnack;
+import top.cnzrg.tanchishe.snack.IControlSnackView;
+import top.cnzrg.tanchishe.snack.Snack;
 import top.cnzrg.tanchishe.util.DebugUtils;
 import top.cnzrg.tanchishe.util.ToastUtils;
 
-public class MainActivity extends Activity implements IControlSnackView, IControlGoalView {
+public class MainActivity extends Activity implements RunningParam.CollDetect, RunningParam.TurnToCallBack, IControlSnackView, IControlGoalView {
     private ControlSnack controlSnack;
     private ControlGoal controlGoal;
 
@@ -32,13 +39,12 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
     private FloatingActionButton dire_down;
     private FloatingActionButton dire_left;
 
-    private Handler mRunHandler;
-    private Handler mCollHandler;
 
     private CollGoal collGoal;
     private CollSnack collSnackHead;
     private CollSnack lastBody;
     private ConstraintLayout game_scene;
+    private RunningParam mRunningParam;
 
 
     @Override
@@ -46,6 +52,7 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mRunningParam = RunningParam.getInstance();
         /**
          * 设置为横屏
          */
@@ -61,6 +68,8 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
 
         initListener();
 
+        mRunningParam.setTurnToCallBack(this);
+        mRunningParam.setCollDetectCallBack(this);
     }
 
     @Override
@@ -79,34 +88,27 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
 
     @Override
     protected void onDestroy() {
-
         gamePause();
-
         gameQuit();
-
-        // 释放资源
-        mCollHandler.removeCallbacksAndMessages(null);
-        mRunHandler.removeCallbacksAndMessages(null);
 
         super.onDestroy();
     }
 
     private void gamePause() {
         System.out.println("gamePause");
-        gameStatus = GameData.STATUS_PAUSE;
+        mRunningParam.gameStatus = GameData.STATUS_PAUSE;
     }
 
     private void gameResume() {
         System.out.println("gameResume");
-        gameStatus = GameData.STATUS_RUNNING;
+        mRunningParam.gameStatus = GameData.STATUS_RUNNING;
     }
 
     private void gameQuit() {
         System.out.println("gameQuit");
-        gameStatus = GameData.STATUS_STOP;
-        isRunning = false;
-        collDetectThread = null;
-        snackRunThread = null;
+        mRunningParam.gameStatus = GameData.STATUS_STOP;
+        mRunningParam.isRunning = false;
+        mRunningParam.end();
     }
 
     private boolean isFirst = true;
@@ -153,81 +155,36 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
     }
 
     private void initListener() {
-        mRunHandler = new RunHandler();
-        mCollHandler = new CollHandler();
 
         dire_up.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getControlSnack().turnUP();
+                mRunningParam.direction = Direction.DIRECTION_UP;
             }
         });
 
         dire_right.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getControlSnack().turnRight();
+                mRunningParam.direction = Direction.DIRECTION_RIGHT;
             }
         });
 
         dire_down.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getControlSnack().turnDown();
+                mRunningParam.direction = Direction.DIRECTION_DOWN;
             }
         });
 
         dire_left.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getControlSnack().turnLeft();
+                mRunningParam.direction = Direction.DIRECTION_LEFT;
             }
         });
     }
 
-    private SnackRunThread snackRunThread;
-
-    private class SnackRunThread extends Thread {
-
-        @Override
-        public void run() {
-            while (isRunning) {
-                if (gameStatus != GameData.STATUS_RUNNING) {
-                    continue;
-                }
-
-                mRunHandler.sendEmptyMessage(controlSnack.getDirection());
-                try {
-                    Thread.sleep(GameData.SNACK_MOVE_TIME_INTERVAL);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
-    private CollDetectThread collDetectThread;
-
-    private class CollDetectThread extends Thread {
-        @Override
-        public void run() {
-            while (isRunning) {
-                if (gameStatus != GameData.STATUS_RUNNING) {
-                    continue;
-                }
-
-                mCollHandler.sendEmptyMessage(0);
-                try {
-                    Thread.sleep(GameData.COLL_GOAL_TIME_INTERVAL);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
-    private boolean isRunning = false;
-    private int gameStatus = GameData.STATUS_STOP;
 
     private void gameStart() {
         // 随机出现一个目标
@@ -236,16 +193,10 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
         // 蛇的碰撞体设置
         createCollSnack();
 
-        isRunning = true;
-        gameStatus = GameData.STATUS_RUNNING;
+        mRunningParam.isRunning = true;
+        mRunningParam.gameStatus = GameData.STATUS_RUNNING;
 
-        // 蛇运动
-        snackRunThread = new SnackRunThread();
-        snackRunThread.start();
-
-        // 碰撞检测线程
-        collDetectThread = new CollDetectThread();
-        collDetectThread.start();
+        mRunningParam.startRefreshData();
     }
 
     private void createCollSnack() {
@@ -350,151 +301,136 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
         collSnackHead.setXY(collSnackHead.getView().getX(), newY);
     }
 
-    private int lastDire = 0;
-
-    class RunHandler extends Handler {
-        @Override
-        synchronized public void handleMessage(Message msg) {
-            if (msg.what == Direction.DIRECTION_UP) {
-                if (collSnackHead.getView().getY() <= 0) {
-                    return;
-                }
-
-                if (lastDire == Direction.DIRECTION_DOWN) {
-                    turnDown();
-                    return;
-                }
-
-                turnUP();
-
+    @Override
+    public void turnTo(int dire) {
+        if (dire == Direction.DIRECTION_UP) {
+            if (collSnackHead.getView().getY() <= 0) {
+                return;
             }
 
-            if (msg.what == Direction.DIRECTION_RIGHT) {
-                if (collSnackHead.getView().getX() >= GameData.SCENE_WIDTH - collSnackHead.getView().getWidth()) {
-                    return;
-                }
-
-                if (lastDire == Direction.DIRECTION_LEFT) {
-                    turnLeft();
-                    return;
-                }
-
-                turnRight();
-            }
-
-            if (msg.what == Direction.DIRECTION_DOWN) {
-                if (collSnackHead.getView().getY() >= GameData.SCENE_HEIGHT - collSnackHead.getView().getHeight()) {
-                    return;
-                }
-
-                if (lastDire == Direction.DIRECTION_UP) {
-                    turnUP();
-                    return;
-                }
-
+            if (mRunningParam.lastDire == Direction.DIRECTION_DOWN) {
                 turnDown();
+                return;
             }
 
-            if (msg.what == Direction.DIRECTION_LEFT) {
-                if (collSnackHead.getView().getX() <= 0) {
-                    return;
-                }
+            turnUP();
 
-                if (lastDire == Direction.DIRECTION_RIGHT) {
-                    turnRight();
-                    return;
-                }
-
-                turnLeft();
-            }
-
-            lastDire = msg.what;
         }
+
+        if (dire == Direction.DIRECTION_RIGHT) {
+            if (collSnackHead.getView().getX() >= GameData.SCENE_WIDTH - collSnackHead.getView().getWidth()) {
+                return;
+            }
+
+            if (mRunningParam.lastDire == Direction.DIRECTION_LEFT) {
+                turnLeft();
+                return;
+            }
+
+            turnRight();
+        }
+
+        if (dire == Direction.DIRECTION_DOWN) {
+            if (collSnackHead.getView().getY() >= GameData.SCENE_HEIGHT - collSnackHead.getView().getHeight()) {
+                return;
+            }
+
+            if (mRunningParam.lastDire == Direction.DIRECTION_UP) {
+                turnUP();
+                return;
+            }
+
+            turnDown();
+        }
+
+        if (dire == Direction.DIRECTION_LEFT) {
+            if (collSnackHead.getView().getX() <= 0) {
+                return;
+            }
+
+            if (mRunningParam.lastDire == Direction.DIRECTION_RIGHT) {
+                turnRight();
+                return;
+            }
+
+            turnLeft();
+        }
+
+        mRunningParam.lastDire = dire;
     }
 
-    private class CollHandler extends Handler {
-        boolean flag = false;
-        int a = 0;
 
-        @Override
-        synchronized public void handleMessage(Message msg) {
-            // if (相撞) -> 目标消失，重新随机出现
+    @Override
+    public CollSnack getCollSnack() {
+        return collSnackHead;
+    }
 
+    @Override
+    public CollGoal getCollGoal() {
+        return collGoal;
+    }
 
-            if (collSnackHead == null || collGoal == null) {
-                return;
-            }
+    private int a = 0;
 
-            //            System.out.println("snack:" + collSnack.getRect());
-//            System.out.println("goal:" + collGoal.getRect());
+    @Override
+    public void collision() {
+        System.out.println("相撞");
+        game_scene.removeView(collGoal.getView());
 
-            if (flag == true)
-                return;
+        collGoal = null;
+        getControlGoal().unRegisterGoal();
+        Goal goal = new Goal();
+        goal.setName("目标-" + ++GameData.GOAL_COUNT);
+        getControlGoal().registerGoal(goal);
 
-            if (collSnackHead.isColl(collGoal)) {
-                flag = true;
-                System.out.println("相撞");
-                game_scene.removeView(collGoal.getView());
+        createCollGoal();
 
-                collGoal = null;
-                getControlGoal().unRegisterGoal();
-                Goal goal = new Goal();
-                goal.setName("目标-" + ++GameData.GOAL_COUNT);
-                getControlGoal().registerGoal(goal);
+        // 蛇身增加一块
+        CollSnack body = new CollSnack();
+        // snack实体还是通用
+        body.setSnack(getControlSnack().getSnack());
 
-                createCollGoal();
-
-                // 蛇身增加一块
-                CollSnack body = new CollSnack();
-                // snack实体还是通用
-                body.setSnack(getControlSnack().getSnack());
-
-                int[] arr = {
-                        R.drawable.body1,
-                        R.drawable.body2,
-                        R.drawable.body3,
-                        R.drawable.body4,
-                        R.drawable.body5,
-                        R.drawable.body6,
-                        R.drawable.body7,
-                        R.drawable.body8,
-                };
+        int[] arr = {
+                R.drawable.body1,
+                R.drawable.body2,
+                R.drawable.body3,
+                R.drawable.body4,
+                R.drawable.body5,
+                R.drawable.body6,
+                R.drawable.body7,
+                R.drawable.body8,
+        };
 
 
-                // 身体图片
-                ImageView bodyView = new ImageView(MainActivity.this);
-                bodyView.setImageResource(arr[a++]);
-                bodyView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        // 身体图片
+        ImageView bodyView = new ImageView(MainActivity.this);
+        bodyView.setImageResource(arr[a++]);
+        bodyView.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
-                // 设置身体图片宽高
-                bodyView.setLayoutParams(new RelativeLayout.LayoutParams(GameData.SNACK_BODY_WIDTH_HEIGHT, GameData.SNACK_BODY_WIDTH_HEIGHT));
+        // 设置身体图片宽高
+        bodyView.setLayoutParams(new RelativeLayout.LayoutParams(GameData.SNACK_BODY_WIDTH_HEIGHT, GameData.SNACK_BODY_WIDTH_HEIGHT));
 
-                if (lastBody == null) {
-                    bodyView.setX(collSnackHead.getLastX());
-                    bodyView.setY(collSnackHead.getLastY());
-                } else {
-                    bodyView.setX(lastBody.getLastX());
-                    bodyView.setY(lastBody.getLastY());
-                }
-                game_scene.addView(bodyView);
-
-                body.setView(bodyView);
-
-                if (lastBody == null) {
-                    lastBody = body;
-                }
-
-                if (collSnackHead.nextBody() == null) {
-                    collSnackHead.addBody(body);
-                } else {
-                    lastBody.addBody(body);
-                    lastBody = body;
-                }
-
-                flag = false;
-            }
-
-
+        if (lastBody == null) {
+            bodyView.setX(collSnackHead.getLastX());
+            bodyView.setY(collSnackHead.getLastY());
+        } else {
+            bodyView.setX(lastBody.getLastX());
+            bodyView.setY(lastBody.getLastY());
         }
+        game_scene.addView(bodyView);
+
+        body.setView(bodyView);
+
+        if (lastBody == null) {
+            lastBody = body;
+        }
+
+        if (collSnackHead.nextBody() == null) {
+            collSnackHead.addBody(body);
+        } else {
+            lastBody.addBody(body);
+            lastBody = body;
+        }
+
     }
 }
