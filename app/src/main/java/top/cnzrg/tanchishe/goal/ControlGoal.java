@@ -1,9 +1,7 @@
-package top.cnzrg.tanchishe;
+package top.cnzrg.tanchishe.goal;
 
 import android.content.Context;
 import android.widget.ImageView;
-
-import java.util.List;
 
 public class ControlGoal implements IControlGoal {
     private Goal goal;

@@ -1,7 +1,9 @@
-package top.cnzrg.tanchishe;
+package top.cnzrg.tanchishe.goal;
 
 import android.graphics.Rect;
 import android.widget.ImageView;
+
+import top.cnzrg.tanchishe.ICollision;
 
 public class CollGoal implements ICollision {
     private ImageView view;

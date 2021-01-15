@@ -1,10 +1,9 @@
-package top.cnzrg.tanchishe;
+package top.cnzrg.tanchishe.snack;
 
-import android.annotation.SuppressLint;
-import android.content.Context;
 import android.graphics.Rect;
-import android.util.AttributeSet;
 import android.widget.ImageView;
+
+import top.cnzrg.tanchishe.ICollision;
 
 public class CollSnack implements ICollision {
 

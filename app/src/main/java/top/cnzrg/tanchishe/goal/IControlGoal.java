@@ -1,4 +1,4 @@
-package top.cnzrg.tanchishe;
+package top.cnzrg.tanchishe.goal;
 
 import android.widget.ImageView;
 

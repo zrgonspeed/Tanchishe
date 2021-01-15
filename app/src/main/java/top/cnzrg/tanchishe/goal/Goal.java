@@ -1,4 +1,4 @@
-package top.cnzrg.tanchishe;
+package top.cnzrg.tanchishe.goal;
 
 public class Goal {
     private String name = "目标";

@@ -1,4 +1,4 @@
-package top.cnzrg.tanchishe;
+package top.cnzrg.tanchishe.snack;
 
 public interface IControlSnack {
     void registerSnack(Snack snack);

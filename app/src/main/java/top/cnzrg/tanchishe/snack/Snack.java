@@ -1,4 +1,4 @@
-package top.cnzrg.tanchishe;
+package top.cnzrg.tanchishe.snack;
 
 public class Snack {
     private String name = "蛇";

@@ -1,11 +1,11 @@
-package top.cnzrg.tanchishe;
+package top.cnzrg.tanchishe.snack;
 
 import android.content.Context;
 
-import static top.cnzrg.tanchishe.Direction.DIRECTION_DOWN;
-import static top.cnzrg.tanchishe.Direction.DIRECTION_LEFT;
-import static top.cnzrg.tanchishe.Direction.DIRECTION_RIGHT;
-import static top.cnzrg.tanchishe.Direction.DIRECTION_UP;
+import static top.cnzrg.tanchishe.param.Direction.DIRECTION_DOWN;
+import static top.cnzrg.tanchishe.param.Direction.DIRECTION_LEFT;
+import static top.cnzrg.tanchishe.param.Direction.DIRECTION_RIGHT;
+import static top.cnzrg.tanchishe.param.Direction.DIRECTION_UP;
 
 public class ControlSnack implements IControlSnack {
     private Snack snack;

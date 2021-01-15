@@ -6,7 +6,7 @@ import android.view.ViewGroup;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 
-import top.cnzrg.tanchishe.GameData;
+import top.cnzrg.tanchishe.param.GameData;
 import top.cnzrg.tanchishe.R;
 
 public class DebugUtils {
