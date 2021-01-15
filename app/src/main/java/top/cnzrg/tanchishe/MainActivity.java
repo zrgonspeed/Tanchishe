@@ -11,16 +11,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.security.SecureRandom;
-import java.util.Random;
 
-import top.cnzrg.tanchishe.util.ToastUtil;
+import top.cnzrg.tanchishe.util.DebugUtils;
+import top.cnzrg.tanchishe.util.ToastUtils;
 
 public class MainActivity extends Activity implements IControlSnackView, IControlGoalView {
     private ControlSnack controlSnack;
@@ -133,40 +132,13 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
 
         System.out.println("SCENE_HEIGHT " + height);
         System.out.println("SCENE_WIDTH " + width);
-        ToastUtil.showLong(this, "H " + height + " W " + width + " S " + snack_head.getWidth());
+        ToastUtils.showLong(this, "H " + height + " W " + width + " S " + snack_head.getWidth());
 
         gameStart();
-
         // 网格线添加
-        addGridLine();
+        DebugUtils.addGridLine(this, game_scene);
     }
 
-    public void addGridLine() {
-        int bianchang = GameData.GRID_LINE_LEN;
-        // 横线
-        for (int i = 0; i < GameData.SCENE_HEIGHT / bianchang + 1; i++) {
-            View v = new View(this);
-            v.setBackgroundColor(getResources().getColor(R.color.black));
-            ConstraintLayout.LayoutParams layoutParams = new ConstraintLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 1);
-            layoutParams.topMargin = bianchang * i;
-            layoutParams.topToTop = R.id.game_scene;
-            v.setLayoutParams(layoutParams);
-
-            game_scene.addView(v);
-        }
-
-        // 竖线
-        for (int i = 0; i < GameData.SCENE_WIDTH / bianchang + 1; i++) {
-            View v = new View(this);
-            v.setBackgroundColor(getResources().getColor(R.color.black));
-            ConstraintLayout.LayoutParams layoutParams = new ConstraintLayout.LayoutParams(1, ViewGroup.LayoutParams.MATCH_PARENT);
-            layoutParams.leftMargin = bianchang * i;
-            layoutParams.startToStart = R.id.game_scene;
-            v.setLayoutParams(layoutParams);
-
-            game_scene.addView(v);
-        }
-    }
 
     private void initUI() {
         game_scene = findViewById(R.id.game_scene);
@@ -339,7 +311,6 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
             System.out.println("game over DIRECTION_UP");
             newY = 0;
         }
-//                collSnackHead.setY(newY);
         collSnackHead.setXY(collSnackHead.getView().getX(), newY);
     }
 
@@ -352,7 +323,6 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
             System.out.println("game over DIRECTION_LEFT");
             newX = 0;
         }
-//                collSnackHead.setX(newX);
         collSnackHead.setXY(newX, collSnackHead.getView().getY());
     }
 
@@ -365,7 +335,6 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
             System.out.println("game over DIRECTION_RIGHT");
             newX = GameData.SCENE_WIDTH - collSnackHead.getView().getWidth();
         }
-//                collSnackHead.setX(newX);
         collSnackHead.setXY(newX, collSnackHead.getView().getY());
     }
 
@@ -378,7 +347,6 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
             System.out.println("game over DIRECTION_DOWN");
             newY = GameData.SCENE_HEIGHT - collSnackHead.getView().getHeight();
         }
-//                collSnackHead.setY(newY);
         collSnackHead.setXY(collSnackHead.getView().getX(), newY);
     }
 
@@ -387,9 +355,6 @@ public class MainActivity extends Activity implements IControlSnackView, IContro
     class RunHandler extends Handler {
         @Override
         synchronized public void handleMessage(Message msg) {
-            // 当前图片四条边处于边界上时，就不移动， game over
-
-
             if (msg.what == Direction.DIRECTION_UP) {
                 if (collSnackHead.getView().getY() <= 0) {
                     return;
