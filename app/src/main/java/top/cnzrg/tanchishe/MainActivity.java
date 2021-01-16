@@ -26,6 +26,7 @@ import top.cnzrg.tanchishe.snack.ControlSnack;
 import top.cnzrg.tanchishe.snack.IControlSnackView;
 import top.cnzrg.tanchishe.snack.Snack;
 import top.cnzrg.tanchishe.util.DebugUtils;
+import top.cnzrg.tanchishe.util.Logger;
 import top.cnzrg.tanchishe.util.ToastUtils;
 
 public class MainActivity extends Activity implements RunningParam.CollDetect, RunningParam.TurnToCallBack, IControlSnackView, IControlGoalView {
@@ -46,11 +47,15 @@ public class MainActivity extends Activity implements RunningParam.CollDetect, R
     private ConstraintLayout game_scene;
     private RunningParam mRunningParam;
 
+    private String TAG;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        TAG = getClass().getSimpleName();
+        Logger.e(TAG, "onCreate()-----------------------");
 
         mRunningParam = RunningParam.getInstance();
         /**
@@ -74,7 +79,7 @@ public class MainActivity extends Activity implements RunningParam.CollDetect, R
 
     @Override
     protected void onResume() {
-        System.out.println("onResume()-----------------------");
+        Logger.e(TAG, "onResume()-----------------------");
         // TODO: 2021/1/12
         gameResume();
         super.onResume();
@@ -82,12 +87,16 @@ public class MainActivity extends Activity implements RunningParam.CollDetect, R
 
     @Override
     protected void onPause() {
+        Logger.e(TAG, "onPause()-----------------------");
+
         gamePause();
         super.onPause();
     }
 
     @Override
     protected void onDestroy() {
+        Logger.e(TAG, "onDestroy()-----------------------");
+
         gamePause();
         gameQuit();
 
@@ -95,17 +104,17 @@ public class MainActivity extends Activity implements RunningParam.CollDetect, R
     }
 
     private void gamePause() {
-        System.out.println("gamePause");
+        Logger.w(TAG, "gamePause()-----------------------");
         mRunningParam.gameStatus = GameData.STATUS_PAUSE;
     }
 
     private void gameResume() {
-        System.out.println("gameResume");
+        Logger.w(TAG, "gameResume()-----------------------");
         mRunningParam.gameStatus = GameData.STATUS_RUNNING;
     }
 
     private void gameQuit() {
-        System.out.println("gameQuit");
+        Logger.w(TAG, "gameQuit()-----------------------");
         mRunningParam.gameStatus = GameData.STATUS_STOP;
         mRunningParam.isRunning = false;
         mRunningParam.end();
@@ -116,7 +125,7 @@ public class MainActivity extends Activity implements RunningParam.CollDetect, R
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        System.out.println("onWindowFocusChanged " + hasFocus);
+        Logger.e(TAG, "onWindowFocusChanged()------" + hasFocus);
 
         if (!isFirst) {
             return;
@@ -132,8 +141,8 @@ public class MainActivity extends Activity implements RunningParam.CollDetect, R
         GameData.SCENE_HEIGHT = height;
         GameData.SCENE_WIDTH = width;
 
-        System.out.println("SCENE_HEIGHT " + height);
-        System.out.println("SCENE_WIDTH " + width);
+        Logger.d(TAG, "SCENE_HEIGHT " + height + ", SCENE_WIDTH " + width);
+
         ToastUtils.showLong(this, "H " + height + " W " + width + " S " + snack_head.getWidth());
 
         gameStart();
@@ -225,8 +234,7 @@ public class MainActivity extends Activity implements RunningParam.CollDetect, R
         collGoal.setGoal(getControlGoal().getGoal());
         collGoal.setView(goalView);
 
-        System.out.println("目标生成:" + collGoal.getName());
-        System.out.println("goalView:" + goalView.getX() + " - " + goalView.getY());
+        Logger.i(TAG, "createCollGoal()------目标生成:" + collGoal.getName() + "  " + goalView.getX() + " - " + goalView.getY());
     }
 
     private void initControlSnack() {
@@ -255,11 +263,11 @@ public class MainActivity extends Activity implements RunningParam.CollDetect, R
 
     @Override
     public void turnUP() {
-        System.out.println("DIRECTION_UP");
+        Logger.d(TAG, "turnUP()");
 
         int newY = (int) (snack_head.getY() - GameData.SNACK_MOVE_DIST_INTERVAL);
         if (newY <= 0) {
-            System.out.println("game over DIRECTION_UP");
+            Logger.i("game over DIRECTION_UP");
             newY = 0;
         }
         collSnackHead.setXY(collSnackHead.getView().getX(), newY);
@@ -267,11 +275,11 @@ public class MainActivity extends Activity implements RunningParam.CollDetect, R
 
     @Override
     public void turnLeft() {
-        System.out.println("DIRECTION_LEFT");
+        Logger.d(TAG, "turnLeft()");
 
         int newX = (int) (snack_head.getX() - GameData.SNACK_MOVE_DIST_INTERVAL);
         if (newX <= 0) {
-            System.out.println("game over DIRECTION_LEFT");
+            Logger.i("game over DIRECTION_LEFT");
             newX = 0;
         }
         collSnackHead.setXY(newX, collSnackHead.getView().getY());
@@ -279,11 +287,11 @@ public class MainActivity extends Activity implements RunningParam.CollDetect, R
 
     @Override
     public void turnRight() {
-        System.out.println("DIRECTION_RIGHT");
+        Logger.d(TAG,"turnRight()");
 
         int newX = (int) (snack_head.getX() + GameData.SNACK_MOVE_DIST_INTERVAL);
         if (newX >= GameData.SCENE_WIDTH - collSnackHead.getView().getWidth()) {
-            System.out.println("game over DIRECTION_RIGHT");
+            Logger.i("game over DIRECTION_RIGHT");
             newX = GameData.SCENE_WIDTH - collSnackHead.getView().getWidth();
         }
         collSnackHead.setXY(newX, collSnackHead.getView().getY());
@@ -291,11 +299,11 @@ public class MainActivity extends Activity implements RunningParam.CollDetect, R
 
     @Override
     public void turnDown() {
-        System.out.println("DIRECTION_DOWN");
+        Logger.d(TAG,"turnDown()");
 
         int newY = (int) (snack_head.getY() + GameData.SNACK_MOVE_DIST_INTERVAL);
         if (newY >= GameData.SCENE_HEIGHT - collSnackHead.getView().getHeight()) {
-            System.out.println("game over DIRECTION_DOWN");
+            Logger.i("game over DIRECTION_DOWN");
             newY = GameData.SCENE_HEIGHT - collSnackHead.getView().getHeight();
         }
         collSnackHead.setXY(collSnackHead.getView().getX(), newY);
@@ -374,7 +382,7 @@ public class MainActivity extends Activity implements RunningParam.CollDetect, R
 
     @Override
     public void collision() {
-        System.out.println("相撞");
+        Logger.i(TAG, "相撞");
         game_scene.removeView(collGoal.getView());
 
         collGoal = null;

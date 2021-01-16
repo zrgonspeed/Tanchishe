@@ -58,25 +58,21 @@ public class ControlSnack implements IControlSnack {
 
     @Override
     public void turnLeft() {
-        System.out.println("左");
         direction = DIRECTION_LEFT;
     }
 
     @Override
     public void turnRight() {
-        System.out.println("右");
         direction = DIRECTION_RIGHT;
     }
 
     @Override
     public void turnUP() {
-        System.out.println("上");
         direction = DIRECTION_UP;
     }
 
     @Override
     public void turnDown() {
-        System.out.println("下");
         direction = DIRECTION_DOWN;
     }
 
