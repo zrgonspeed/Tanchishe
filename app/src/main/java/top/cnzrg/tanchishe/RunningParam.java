@@ -3,9 +3,12 @@ package top.cnzrg.tanchishe;
 import android.os.Handler;
 import android.os.Message;
 
+import java.lang.ref.WeakReference;
+
 import top.cnzrg.tanchishe.goal.CollGoal;
 import top.cnzrg.tanchishe.param.GameData;
 import top.cnzrg.tanchishe.snack.CollSnack;
+import top.cnzrg.tanchishe.util.Logger;
 
 public class RunningParam {
     private static RunningParam instance;
@@ -52,11 +55,12 @@ public class RunningParam {
     }
 
     private RunningParam() {
-        mRunHandler = new RunHandler();
-        mCollHandler = new CollHandler();
     }
 
     public void startRefreshData() {
+        mRunHandler = new RunHandler(this);
+        mCollHandler = new CollHandler(this);
+
         // 蛇运动
         snackRunThread = new SnackRunThread();
         snackRunThread.start();
@@ -70,28 +74,28 @@ public class RunningParam {
         if (isRunning) {
             isRunning = false;
         }
+        interrupted();
+
         mCollHandler.removeCallbacksAndMessages(null);
         mRunHandler.removeCallbacksAndMessages(null);
+
+        mRunHandler = null;
+        mCollHandler = null;
 
         mTurnToCallBack = null;
         mCollDetectCallBack = null;
 
-        interrupted();
+        instance = null;
     }
 
     public synchronized void interrupted() {
-        try {
-            if (snackRunThread != null) {
-                snackRunThread.interrupt();
-                snackRunThread = null;
-            }
-            if (collDetectThread != null) {
-                collDetectThread.interrupt();
-                collDetectThread = null;
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (snackRunThread != null) {
+            snackRunThread.interrupt();
+            snackRunThread = null;
+        }
+        if (collDetectThread != null) {
+            collDetectThread.interrupt();
+            collDetectThread = null;
         }
     }
 
@@ -116,19 +120,34 @@ public class RunningParam {
                 try {
                     Thread.sleep(GameData.SNACK_MOVE_TIME_INTERVAL);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    Logger.w(TAG, "运行线程中断");
                 }
             }
         }
     }
 
 
-    private class RunHandler extends Handler {
+    private static class RunHandler extends Handler {
+        private WeakReference<RunningParam> weakReference;
+        private RunningParam mRunningParam;
+
+        RunHandler(RunningParam mRunningParam) {
+            if (mRunningParam != null) {
+                weakReference = new WeakReference<>(mRunningParam);
+            }
+        }
         @Override
         synchronized public void handleMessage(Message msg) {
-            mTurnToCallBack.turnTo(msg.what);
+            mRunningParam = weakReference.get();
+            if (mRunningParam == null) {
+                return;
+            }
+
+            mRunningParam.mTurnToCallBack.turnTo(msg.what);
         }
     }
+
+    public static String TAG = "RunningParam";
 
     private class CollDetectThread extends Thread {
         @Override
@@ -142,22 +161,35 @@ public class RunningParam {
                 try {
                     Thread.sleep(GameData.COLL_GOAL_TIME_INTERVAL);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    Logger.w(TAG, "碰撞线程中断");
                 }
             }
         }
     }
 
 
-    private class CollHandler extends Handler {
+    private static class CollHandler extends Handler {
+        private WeakReference<RunningParam> weakReference;
+        private RunningParam mRunningParam;
+
         boolean flag = false;
 
+        CollHandler(RunningParam mRunningParam) {
+            if (mRunningParam != null) {
+                weakReference = new WeakReference<>(mRunningParam);
+            }
+        }
         @Override
         synchronized public void handleMessage(Message msg) {
+            mRunningParam = weakReference.get();
+            if (mRunningParam == null) {
+                return;
+            }
+
             // if (相撞) -> 目标消失，重新随机出现
 
-            CollGoal collGoal = mCollDetectCallBack.getCollGoal();
-            CollSnack collSnack = mCollDetectCallBack.getCollSnack();
+            CollGoal collGoal = mRunningParam.mCollDetectCallBack.getCollGoal();
+            CollSnack collSnack = mRunningParam.mCollDetectCallBack.getCollSnack();
 
             if (collSnack == null || collGoal == null) {
                 return;
@@ -169,9 +201,9 @@ public class RunningParam {
             if (collSnack.isColl(collGoal)) {
                 flag = true;
                 // 吃到目标数计数
-                eatGoalCount++;
-                mCollDetectCallBack.collision();
-                mCollDetectCallBack.collisionAfter();
+                mRunningParam.eatGoalCount++;
+                mRunningParam.mCollDetectCallBack.collision();
+                mRunningParam.mCollDetectCallBack.collisionAfter();
                 flag = false;
             }
         }

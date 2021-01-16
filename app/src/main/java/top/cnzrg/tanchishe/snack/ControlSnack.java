@@ -76,6 +76,13 @@ public class ControlSnack implements IControlSnack {
         direction = DIRECTION_DOWN;
     }
 
+    @Override
+    public void destory() {
+
+        mContext = null;
+        mView = null;
+    }
+
     public Snack getSnack() {
         return snack;
     }

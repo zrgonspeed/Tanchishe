@@ -79,6 +79,8 @@ public class MainActivity extends Activity implements RunningParam.CollDetect, R
         mRunningParam.setCollDetectCallBack(this);
     }
 
+    private boolean released = false;
+
     @Override
     protected void onResume() {
         Logger.e(TAG, "onResume()-----------------------");
@@ -96,6 +98,7 @@ public class MainActivity extends Activity implements RunningParam.CollDetect, R
         if (isFinishing()) {
             gameQuit();
             release();
+            released = true;
         }
         super.onPause();
     }
@@ -104,11 +107,14 @@ public class MainActivity extends Activity implements RunningParam.CollDetect, R
     protected void onDestroy() {
         Logger.e(TAG, "onDestroy()-----------------------");
 
+        if (released) {
+            super.onDestroy();
+            return;
+        }
         gamePause();
         gameQuit();
 
         release();
-
         super.onDestroy();
     }
 
@@ -127,6 +133,16 @@ public class MainActivity extends Activity implements RunningParam.CollDetect, R
 
         controlSnack.unRegisterSnack();
         controlGoal.unRegisterGoal();
+
+        controlSnack.destory();
+        controlGoal.destory();
+
+        controlSnack = null;
+        controlGoal = null;
+
+        mRunningParam = null;
+
+        ToastUtils.destory();
     }
 
     private void gamePause() {
@@ -267,14 +283,14 @@ public class MainActivity extends Activity implements RunningParam.CollDetect, R
     private void initControlSnack() {
         controlSnack = getControlSnack();
         controlSnack.registerSnack(new Snack());
-        controlSnack.setContext(this);
+        controlSnack.setContext(getApplicationContext());
         controlSnack.setView(this);
     }
 
     private void initControlGoal() {
         controlGoal = getControlGoal();
         controlGoal.registerGoal(new Goal());
-        controlGoal.setContext(this);
+        controlGoal.setContext(getApplicationContext());
         controlGoal.setView(this);
     }
 

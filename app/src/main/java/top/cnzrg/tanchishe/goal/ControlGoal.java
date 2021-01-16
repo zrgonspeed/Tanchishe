@@ -57,6 +57,12 @@ public class ControlGoal implements IControlGoal {
 
     }
 
+    @Override
+    public void destory() {
+        mContext = null;
+        mView = null;
+    }
+
     public Goal getGoal() {
         return goal;
     }

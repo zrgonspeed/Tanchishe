@@ -13,4 +13,6 @@ public interface IControlSnack {
 
     void turnDown();
 
+    void destory();
+
 }

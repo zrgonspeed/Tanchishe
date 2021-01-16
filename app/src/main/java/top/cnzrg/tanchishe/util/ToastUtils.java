@@ -15,6 +15,10 @@ public class ToastUtils {
     private static boolean isShow = true;//默认显示
     private static Toast mToast = null;//全局唯一的Toast
 
+    public static void destory() {
+        mToast = null;
+    }
+
     /**
      * private控制不应该被实例化
      */

@@ -13,4 +13,6 @@ public interface IControlGoal {
     int getSize();
 
     void setImage(ImageView imageView);
+
+    void destory();
 }
