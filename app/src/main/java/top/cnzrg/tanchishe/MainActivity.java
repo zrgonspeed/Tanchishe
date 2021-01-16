@@ -3,6 +3,7 @@ package top.cnzrg.tanchishe;
 
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.View;
@@ -31,7 +32,7 @@ import top.cnzrg.tanchishe.util.DebugUtils;
 import top.cnzrg.tanchishe.util.Logger;
 import top.cnzrg.tanchishe.util.ToastUtils;
 
-public class MainActivity extends Activity implements RunningParam.CollDetect, RunningParam.TurnToCallBack, IControlSnackView, IControlGoalView {
+public class MainActivity extends Activity implements GameFlow, RunningParam.CollDetect, RunningParam.TurnToCallBack, IControlSnackView, IControlGoalView {
     private ControlSnack controlSnack;
     private ControlGoal controlGoal;
 
@@ -145,17 +146,22 @@ public class MainActivity extends Activity implements RunningParam.CollDetect, R
         ToastUtils.destory();
     }
 
-    private void gamePause() {
+    public void gamePause() {
         Logger.w(TAG, "gamePause()-----------------------");
         mRunningParam.gameStatus = GameData.STATUS_PAUSE;
     }
 
-    private void gameResume() {
+    public void gameResume() {
         Logger.w(TAG, "gameResume()-----------------------");
         mRunningParam.gameStatus = GameData.STATUS_RUNNING;
     }
 
-    private void gameQuit() {
+    @Override
+    public void gameOver() {
+        ToastUtils.showLong(getApplicationContext(), "GameOver");
+    }
+
+    public void gameQuit() {
         Logger.w(TAG, "gameQuit()-----------------------");
         mRunningParam.gameStatus = GameData.STATUS_STOP;
         mRunningParam.isRunning = false;
@@ -310,6 +316,7 @@ public class MainActivity extends Activity implements RunningParam.CollDetect, R
 
         int newY = (int) (snack_head.getY() - GameData.SNACK_MOVE_DIST_INTERVAL);
         if (newY <= 0) {
+            gameOver();
             Logger.i("game over DIRECTION_UP");
             newY = 0;
         }
@@ -322,6 +329,7 @@ public class MainActivity extends Activity implements RunningParam.CollDetect, R
 
         int newX = (int) (snack_head.getX() - GameData.SNACK_MOVE_DIST_INTERVAL);
         if (newX <= 0) {
+            gameOver();
             Logger.i("game over DIRECTION_LEFT");
             newX = 0;
         }
@@ -334,6 +342,7 @@ public class MainActivity extends Activity implements RunningParam.CollDetect, R
 
         int newX = (int) (snack_head.getX() + GameData.SNACK_MOVE_DIST_INTERVAL);
         if (newX >= GameData.SCENE_WIDTH - collSnackHead.getView().getWidth()) {
+            gameOver();
             Logger.i("game over DIRECTION_RIGHT");
             newX = GameData.SCENE_WIDTH - collSnackHead.getView().getWidth();
         }
@@ -346,6 +355,7 @@ public class MainActivity extends Activity implements RunningParam.CollDetect, R
 
         int newY = (int) (snack_head.getY() + GameData.SNACK_MOVE_DIST_INTERVAL);
         if (newY >= GameData.SCENE_HEIGHT - collSnackHead.getView().getHeight()) {
+            gameOver();
             Logger.i("game over DIRECTION_DOWN");
             newY = GameData.SCENE_HEIGHT - collSnackHead.getView().getHeight();
         }
