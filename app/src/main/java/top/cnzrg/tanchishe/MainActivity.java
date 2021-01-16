@@ -90,6 +90,11 @@ public class MainActivity extends Activity implements RunningParam.CollDetect, R
         Logger.e(TAG, "onPause()-----------------------");
 
         gamePause();
+
+        if (isFinishing()) {
+            gameQuit();
+            release();
+        }
         super.onPause();
     }
 
@@ -106,6 +111,8 @@ public class MainActivity extends Activity implements RunningParam.CollDetect, R
     }
 
     private void release() {
+        Logger.i(TAG,"释放资源");
+
         collGoal = null;
         collSnackHead = null;
         lastBody = null;
