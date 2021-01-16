@@ -8,12 +8,14 @@ import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.security.SecureRandom;
+import java.text.BreakIterator;
 
 import top.cnzrg.tanchishe.goal.CollGoal;
 import top.cnzrg.tanchishe.goal.ControlGoal;
@@ -40,7 +42,6 @@ public class MainActivity extends Activity implements RunningParam.CollDetect, R
     private FloatingActionButton dire_down;
     private FloatingActionButton dire_left;
 
-
     private CollGoal collGoal;
     private CollSnack collSnackHead;
     private CollSnack lastBody;
@@ -48,6 +49,7 @@ public class MainActivity extends Activity implements RunningParam.CollDetect, R
     private RunningParam mRunningParam;
 
     private String TAG;
+    private TextView tv_eatCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -185,6 +187,7 @@ public class MainActivity extends Activity implements RunningParam.CollDetect, R
         dire_down = findViewById(R.id.dire_down);
         dire_left = findViewById(R.id.dire_left);
 
+        tv_eatCount = findViewById(R.id.tv_eatCount);
     }
 
     private void initListener() {
@@ -464,5 +467,12 @@ public class MainActivity extends Activity implements RunningParam.CollDetect, R
             lastBody = body;
         }
 
+    }
+
+    @Override
+    public void collisionAfter() {
+        // 吃到目标后，数据刷新
+        int eatGoalCount = mRunningParam.getEatGoalCount();
+        tv_eatCount.setText("" + eatGoalCount);
     }
 }

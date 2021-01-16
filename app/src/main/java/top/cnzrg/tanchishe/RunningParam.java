@@ -25,6 +25,12 @@ public class RunningParam {
     private TurnToCallBack mTurnToCallBack;
     private CollDetect mCollDetectCallBack;
 
+    private int eatGoalCount = 0;
+
+    public int getEatGoalCount() {
+        return eatGoalCount;
+    }
+
     /**
      * 转向
      */
@@ -41,6 +47,8 @@ public class RunningParam {
         CollGoal getCollGoal();
 
         void collision();
+
+        void collisionAfter();
     }
 
     private RunningParam() {
@@ -160,7 +168,10 @@ public class RunningParam {
 
             if (collSnack.isColl(collGoal)) {
                 flag = true;
+                // 吃到目标数计数
+                eatGoalCount++;
                 mCollDetectCallBack.collision();
+                mCollDetectCallBack.collisionAfter();
                 flag = false;
             }
         }
