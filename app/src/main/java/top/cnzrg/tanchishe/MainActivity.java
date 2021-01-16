@@ -100,7 +100,24 @@ public class MainActivity extends Activity implements RunningParam.CollDetect, R
         gamePause();
         gameQuit();
 
+        release();
+
         super.onDestroy();
+    }
+
+    private void release() {
+        collGoal = null;
+        collSnackHead = null;
+        lastBody = null;
+        snack_head = null;
+
+        this.dire_down = null;
+        this.dire_left = null;
+        this.dire_right = null;
+        this.dire_up = null;
+
+        controlSnack.unRegisterSnack();
+        controlGoal.unRegisterGoal();
     }
 
     private void gamePause() {
