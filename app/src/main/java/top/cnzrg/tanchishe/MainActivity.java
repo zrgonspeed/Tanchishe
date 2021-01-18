@@ -65,6 +65,7 @@ public class MainActivity extends Activity implements GameFlow, RunningParam.Col
 
     /**
      * 防止横屏闪退
+     *
      * @param newConfig
      */
     @Override
@@ -148,7 +149,7 @@ public class MainActivity extends Activity implements GameFlow, RunningParam.Col
     }
 
     private void release() {
-        Logger.i(TAG,"释放资源");
+        Logger.i(TAG, "释放资源");
 
         collGoal = null;
         collSnackHead = null;
@@ -226,22 +227,8 @@ public class MainActivity extends Activity implements GameFlow, RunningParam.Col
         // 网格线添加
         DebugUtils.addGridLine(this, game_scene);
 
-        // 填充屏幕右边和下班
-        View view = new View(this);
-        view.setBackgroundColor(R.color.black);
-        view.setX(GameData.SCENE_WIDTH);
-        view.setY(0);
-
-        view.setLayoutParams(new RelativeLayout.LayoutParams(width - GameData.SCENE_WIDTH, height));
-        game_scene.addView(view);
-
-        View view2 = new View(this);
-        view2.setBackgroundColor(R.color.black);
-        view2.setX(0);
-        view2.setY(GameData.SCENE_HEIGHT);
-
-        view2.setLayoutParams(new RelativeLayout.LayoutParams(width, height - GameData.SCENE_HEIGHT));
-        game_scene.addView(view2);
+        // 填充屏幕右边和下边
+        WindowUtils.fillRightAndBottom(this, game_scene, width, height);
     }
 
 
@@ -310,7 +297,7 @@ public class MainActivity extends Activity implements GameFlow, RunningParam.Col
         collSnackHead = new CollSnack();
         collSnackHead.setSnack(getControlSnack().getSnack());
         collSnackHead.setView(snack_head);
-        collSnackHead.setXY(300f,300f);
+        collSnackHead.setXY(300f, 300f);
     }
 
     SecureRandom random = new SecureRandom();
@@ -396,7 +383,7 @@ public class MainActivity extends Activity implements GameFlow, RunningParam.Col
 
     @Override
     public void turnRight() {
-        Logger.d(TAG,"turnRight()");
+        Logger.d(TAG, "turnRight()");
 
         if (snack_head.getX() >= GameData.SCENE_WIDTH - collSnackHead.getView().getWidth()) {
             gameOver();
@@ -413,7 +400,7 @@ public class MainActivity extends Activity implements GameFlow, RunningParam.Col
 
     @Override
     public void turnDown() {
-        Logger.d(TAG,"turnDown()");
+        Logger.d(TAG, "turnDown()");
 
         if (snack_head.getY() > GameData.SCENE_HEIGHT - collSnackHead.getView().getHeight()) {
             gameOver();
