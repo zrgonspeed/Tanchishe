@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.View;
@@ -36,6 +37,7 @@ import top.cnzrg.tanchishe.snack.SnackHeadImageView;
 import top.cnzrg.tanchishe.util.DebugUtils;
 import top.cnzrg.tanchishe.util.Logger;
 import top.cnzrg.tanchishe.util.ToastUtils;
+import top.cnzrg.tanchishe.util.WindowUtils;
 
 import static top.cnzrg.tanchishe.snack.SnackHeadImageView.getRoundBitmapByShader;
 
@@ -63,6 +65,9 @@ public class MainActivity extends Activity implements GameFlow, RunningParam.Col
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //隐藏虚拟按键，并且全屏
+        WindowUtils.hideBottomUIMenu(getWindow());
 
         TAG = getClass().getSimpleName();
         Logger.e(TAG, "onCreate()-----------------------");
