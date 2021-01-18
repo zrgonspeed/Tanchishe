@@ -3,6 +3,9 @@ package top.cnzrg.tanchishe;
 
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -28,15 +31,18 @@ import top.cnzrg.tanchishe.snack.CollSnack;
 import top.cnzrg.tanchishe.snack.ControlSnack;
 import top.cnzrg.tanchishe.snack.IControlSnackView;
 import top.cnzrg.tanchishe.snack.Snack;
+import top.cnzrg.tanchishe.snack.SnackHeadImageView;
 import top.cnzrg.tanchishe.util.DebugUtils;
 import top.cnzrg.tanchishe.util.Logger;
 import top.cnzrg.tanchishe.util.ToastUtils;
+
+import static top.cnzrg.tanchishe.snack.SnackHeadImageView.getRoundBitmapByShader;
 
 public class MainActivity extends Activity implements GameFlow, RunningParam.CollDetect, RunningParam.TurnToCallBack, IControlSnackView, IControlGoalView {
     private ControlSnack controlSnack;
     private ControlGoal controlGoal;
 
-    private ImageView snack_head;
+    private SnackHeadImageView snack_head;
 
     private FloatingActionButton dire_up;
     private FloatingActionButton dire_right;
@@ -203,6 +209,9 @@ public class MainActivity extends Activity implements GameFlow, RunningParam.Col
         game_scene = findViewById(R.id.game_scene);
 
         snack_head = findViewById(R.id.snack_head);
+        // 动态设置蛇头，有圆角边框
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.shetou);
+        snack_head.setImageBitmap(bitmap);
 
         dire_up = findViewById(R.id.dire_up);
         dire_right = findViewById(R.id.dire_right);

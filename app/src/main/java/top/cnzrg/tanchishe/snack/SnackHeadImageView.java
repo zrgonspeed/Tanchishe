@@ -1,0 +1,144 @@
+package top.cnzrg.tanchishe.snack;
+
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapShader;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.PixelFormat;
+import android.graphics.Rect;
+import android.graphics.RectF;
+import android.graphics.Shader;
+import android.graphics.drawable.Drawable;
+import android.util.AttributeSet;
+import android.widget.ImageView;
+
+import androidx.annotation.Nullable;
+
+import top.cnzrg.tanchishe.util.Logger;
+
+@SuppressLint("AppCompatCustomView")
+public class SnackHeadImageView extends ImageView {
+    private int co;
+    private int borderwidth;
+
+    //设置颜色
+    public void setColour(int color) {
+        co = color;
+    }
+
+    //设置边框宽度
+    public void setBorderWidth(int width) {
+        borderwidth = width;
+    }
+
+    public SnackHeadImageView(Context context) {
+        super(context);
+        paint = new Paint();
+    }
+
+    public SnackHeadImageView(Context context, @Nullable AttributeSet attrs) {
+        super(context, attrs);
+        paint = new Paint();
+    }
+
+    public SnackHeadImageView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        paint = new Paint();
+    }
+
+    public SnackHeadImageView(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+        super(context, attrs, defStyleAttr, defStyleRes);
+        paint = new Paint();
+    }
+
+    private Paint paint;
+    private int radius = 30;
+    private int border = 3;
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+//        super.onDraw(canvas);
+//        // 画边框
+//        Rect rec = canvas.getClipBounds();
+//        rec.bottom--;
+//        rec.right--;
+//        Paint paint = new Paint();
+//        //设置边框颜色
+//        paint.setColor(co);
+//        paint.setStyle(Paint.Style.STROKE);
+//        //设置边框宽度
+//        paint.setStrokeWidth(borderwidth);
+//        canvas.drawRect(rec, paint);
+        Drawable drawable = getDrawable();
+        if (null != drawable) {
+            Bitmap bitmap = getBitmapFromDrawable(drawable);
+//   Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
+            Bitmap b = getRoundBitmapByShader(bitmap, getWidth(), getHeight(), radius, 3);
+            final Rect rectSrc = new Rect(0, 0, b.getWidth(), b.getHeight());
+            final Rect rectDest = new Rect(0, 0, getWidth(), getHeight());
+            paint.reset();
+            canvas.drawBitmap(b, rectSrc, rectDest, paint);
+        } else {
+            super.onDraw(canvas);
+        }
+    }
+
+    /**
+     * 把资源图片转换成Bitmap
+     *
+     * @param drawable 资源图片
+     * @return 位图
+     */
+    public static Bitmap getBitmapFromDrawable(Drawable drawable) {
+        int width = drawable.getIntrinsicWidth();
+        int height = drawable.getIntrinsicHeight();
+        Bitmap bitmap = Bitmap.createBitmap(width, height, drawable
+                .getOpacity() != PixelFormat.OPAQUE ? Bitmap.Config.ARGB_8888
+                : Bitmap.Config.RGB_565);
+        Canvas canvas = new Canvas(bitmap);
+//drawable.setBounds(-4, -4, width + 4, height + 4);
+        drawable.draw(canvas);
+        return bitmap;
+    }
+
+    public static Bitmap getRoundBitmapByShader(Bitmap bitmap, int outWidth, int outHeight, int radius, int boarder) {
+        if (bitmap == null) {
+            return null;
+        }
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        float widthScale = outWidth * 1f / width;
+        float heightScale = outHeight * 1f / height;
+
+        Matrix matrix = new Matrix();
+        matrix.setScale(widthScale, heightScale);
+//创建输出的bitmap
+        Bitmap desBitmap = Bitmap.createBitmap(outWidth, outHeight, Bitmap.Config.ARGB_8888);
+//创建canvas并传入desBitmap，这样绘制的内容都会在desBitmap上
+        Canvas canvas = new Canvas(desBitmap);
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+//创建着色器
+        BitmapShader bitmapShader = new BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
+//给着色器配置matrix
+        bitmapShader.setLocalMatrix(matrix);
+        paint.setShader(bitmapShader);
+//创建矩形区域并且预留出border
+        RectF rect = new RectF(boarder, boarder, outWidth - boarder, outHeight - boarder);
+//把传入的bitmap绘制到圆角矩形区域内
+        canvas.drawRoundRect(rect, radius, radius, paint);
+
+        if (boarder > 0) {
+//绘制boarder
+            Paint boarderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            boarderPaint.setColor(Color.BLACK);
+            boarderPaint.setStyle(Paint.Style.STROKE);
+            boarderPaint.setStrokeWidth(boarder);
+            canvas.drawRoundRect(rect, radius, radius, boarderPaint);
+        }
+        return desBitmap;
+    }
+}
