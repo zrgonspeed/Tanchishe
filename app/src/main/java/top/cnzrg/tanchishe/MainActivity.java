@@ -1,6 +1,7 @@
 package top.cnzrg.tanchishe;
 
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
@@ -176,6 +177,7 @@ public class MainActivity extends Activity implements GameFlow, RunningParam.Col
 
     private boolean isFirst = true;
 
+    @SuppressLint("ResourceAsColor")
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
@@ -192,8 +194,8 @@ public class MainActivity extends Activity implements GameFlow, RunningParam.Col
         int width = metric.widthPixels; // 宽度（PX）
         int height = metric.heightPixels; // 高度（PX）
 
-        GameData.SCENE_HEIGHT = height;
-        GameData.SCENE_WIDTH = width;
+        GameData.SCENE_HEIGHT = height / 100 * 100;
+        GameData.SCENE_WIDTH = width / 100 * 100;
 
         Logger.d(TAG, "SCENE_HEIGHT " + height + ", SCENE_WIDTH " + width);
 
@@ -202,6 +204,23 @@ public class MainActivity extends Activity implements GameFlow, RunningParam.Col
         gameStart();
         // 网格线添加
         DebugUtils.addGridLine(this, game_scene);
+
+        // 填充屏幕右边和下班
+        View view = new View(this);
+        view.setBackgroundColor(R.color.black);
+        view.setX(GameData.SCENE_WIDTH);
+        view.setY(0);
+
+        view.setLayoutParams(new RelativeLayout.LayoutParams(width - GameData.SCENE_WIDTH, height));
+        game_scene.addView(view);
+
+        View view2 = new View(this);
+        view2.setBackgroundColor(R.color.black);
+        view2.setX(0);
+        view2.setY(GameData.SCENE_HEIGHT);
+
+        view2.setLayoutParams(new RelativeLayout.LayoutParams(width, height - GameData.SCENE_HEIGHT));
+        game_scene.addView(view2);
     }
 
 
@@ -270,6 +289,7 @@ public class MainActivity extends Activity implements GameFlow, RunningParam.Col
         collSnackHead = new CollSnack();
         collSnackHead.setSnack(getControlSnack().getSnack());
         collSnackHead.setView(snack_head);
+        collSnackHead.setXY(300f,300f);
     }
 
     SecureRandom random = new SecureRandom();
@@ -323,10 +343,14 @@ public class MainActivity extends Activity implements GameFlow, RunningParam.Col
     public void turnUP() {
         Logger.d(TAG, "turnUP()");
 
-        int newY = (int) (snack_head.getY() - GameData.SNACK_MOVE_DIST_INTERVAL);
-        if (newY <= 0) {
+        if (snack_head.getY() < 0) {
             gameOver();
-            Logger.i("game over DIRECTION_UP");
+            return;
+        }
+
+        int newY = (int) (snack_head.getY() - GameData.SNACK_MOVE_DIST_INTERVAL);
+        if (newY < 0) {
+            gameOver();
             newY = 0;
         }
         collSnackHead.setXY(collSnackHead.getView().getX(), newY);
@@ -336,10 +360,14 @@ public class MainActivity extends Activity implements GameFlow, RunningParam.Col
     public void turnLeft() {
         Logger.d(TAG, "turnLeft()");
 
-        int newX = (int) (snack_head.getX() - GameData.SNACK_MOVE_DIST_INTERVAL);
-        if (newX <= 0) {
+        if (snack_head.getX() < 0) {
             gameOver();
-            Logger.i("game over DIRECTION_LEFT");
+            return;
+        }
+
+        int newX = (int) (snack_head.getX() - GameData.SNACK_MOVE_DIST_INTERVAL);
+        if (newX < 0) {
+            gameOver();
             newX = 0;
         }
         collSnackHead.setXY(newX, collSnackHead.getView().getY());
@@ -349,10 +377,14 @@ public class MainActivity extends Activity implements GameFlow, RunningParam.Col
     public void turnRight() {
         Logger.d(TAG,"turnRight()");
 
-        int newX = (int) (snack_head.getX() + GameData.SNACK_MOVE_DIST_INTERVAL);
-        if (newX >= GameData.SCENE_WIDTH - collSnackHead.getView().getWidth()) {
+        if (snack_head.getX() >= GameData.SCENE_WIDTH - collSnackHead.getView().getWidth()) {
             gameOver();
-            Logger.i("game over DIRECTION_RIGHT");
+            return;
+        }
+
+        int newX = (int) (snack_head.getX() + GameData.SNACK_MOVE_DIST_INTERVAL);
+        if (newX > GameData.SCENE_WIDTH - collSnackHead.getView().getWidth()) {
+            gameOver();
             newX = GameData.SCENE_WIDTH - collSnackHead.getView().getWidth();
         }
         collSnackHead.setXY(newX, collSnackHead.getView().getY());
@@ -362,10 +394,14 @@ public class MainActivity extends Activity implements GameFlow, RunningParam.Col
     public void turnDown() {
         Logger.d(TAG,"turnDown()");
 
-        int newY = (int) (snack_head.getY() + GameData.SNACK_MOVE_DIST_INTERVAL);
-        if (newY >= GameData.SCENE_HEIGHT - collSnackHead.getView().getHeight()) {
+        if (snack_head.getY() > GameData.SCENE_HEIGHT - collSnackHead.getView().getHeight()) {
             gameOver();
-            Logger.i("game over DIRECTION_DOWN");
+            return;
+        }
+
+        int newY = (int) (snack_head.getY() + GameData.SNACK_MOVE_DIST_INTERVAL);
+        if (newY > GameData.SCENE_HEIGHT - collSnackHead.getView().getHeight()) {
+            gameOver();
             newY = GameData.SCENE_HEIGHT - collSnackHead.getView().getHeight();
         }
         collSnackHead.setXY(collSnackHead.getView().getX(), newY);
@@ -375,7 +411,10 @@ public class MainActivity extends Activity implements GameFlow, RunningParam.Col
     public void turnTo(int dire) {
         if (dire == Direction.DIRECTION_UP) {
             if (collSnackHead.getView().getY() <= 0) {
-                return;
+                if (mRunningParam.lastDire != Direction.DIRECTION_UP) {
+                    turnTo(mRunningParam.lastDire);
+                    return;
+                }
             }
 
             if (mRunningParam.lastDire == Direction.DIRECTION_DOWN) {
@@ -389,7 +428,10 @@ public class MainActivity extends Activity implements GameFlow, RunningParam.Col
 
         if (dire == Direction.DIRECTION_RIGHT) {
             if (collSnackHead.getView().getX() >= GameData.SCENE_WIDTH - collSnackHead.getView().getWidth()) {
-                return;
+                if (mRunningParam.lastDire != Direction.DIRECTION_RIGHT) {
+                    turnTo(mRunningParam.lastDire);
+                    return;
+                }
             }
 
             if (mRunningParam.lastDire == Direction.DIRECTION_LEFT) {
@@ -402,7 +444,10 @@ public class MainActivity extends Activity implements GameFlow, RunningParam.Col
 
         if (dire == Direction.DIRECTION_DOWN) {
             if (collSnackHead.getView().getY() >= GameData.SCENE_HEIGHT - collSnackHead.getView().getHeight()) {
-                return;
+                if (mRunningParam.lastDire != Direction.DIRECTION_DOWN) {
+                    turnTo(mRunningParam.lastDire);
+                    return;
+                }
             }
 
             if (mRunningParam.lastDire == Direction.DIRECTION_UP) {
@@ -415,7 +460,10 @@ public class MainActivity extends Activity implements GameFlow, RunningParam.Col
 
         if (dire == Direction.DIRECTION_LEFT) {
             if (collSnackHead.getView().getX() <= 0) {
-                return;
+                if (mRunningParam.lastDire != Direction.DIRECTION_LEFT) {
+                    turnTo(mRunningParam.lastDire);
+                    return;
+                }
             }
 
             if (mRunningParam.lastDire == Direction.DIRECTION_RIGHT) {
