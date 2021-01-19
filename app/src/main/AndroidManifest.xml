@@ -4,15 +4,21 @@
 
     <application
         android:allowBackup="true"
-        android:supportsRtl="true"
+        android:icon="@drawable/shetou"
         android:label="贪吃蛇"
         android:screenOrientation="landscape"
-        android:icon="@drawable/shetou"
+        android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
         <activity
-            android:launchMode="singleTask"
+            android:name=".GameSceneActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
-            android:name=".MainActivity">
+            android:launchMode="singleTask">
+        </activity>
+
+        <activity
+            android:name=".MainActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/game_scene"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#BFBFBF">
+
+    <!--<View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="#000000" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_marginTop="100px"
+        android:background="#000000"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_marginTop="200px"
+        android:background="#000000"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_marginTop="300px"
+        android:background="#000000"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_marginTop="400px"
+        android:background="#000000"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_marginTop="500px"
+        android:background="#000000"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_marginTop="600px"
+        android:background="#000000"
+        app:layout_constraintTop_toTopOf="parent" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_marginTop="700px"
+        android:background="#000000"
+        app:layout_constraintTop_toTopOf="parent" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_marginTop="800px"
+        android:background="#000000"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:layout_width="1px"
+        android:layout_height="match_parent"
+        android:background="#000000" />
+
+    <View
+        android:layout_width="1px"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="100px"
+        android:background="#000000" />
+
+    <View
+        android:layout_width="1px"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="200px"
+        android:background="#000000" />
+    <View
+        android:layout_width="1px"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="300px"
+        android:background="#000000" />
+    <View
+        android:layout_width="1px"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="400px"
+        android:background="#000000" />
+
+    <View
+        android:layout_width="1px"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="500px"
+        android:background="#000000" />
+    <View
+        android:layout_width="1px"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="600px"
+        android:background="#000000" />
+    <View
+        android:layout_width="1px"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="700px"
+        android:background="#000000" />
+
+    <View
+        android:layout_width="1px"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="800px"
+        android:background="#000000" />
+
+    <View
+        android:layout_width="1px"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="900px"
+        android:background="#000000" />
+
+    <View
+        android:layout_width="1px"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="1000px"
+        android:background="#000000" />-->
+
+    <top.cnzrg.tanchishe.snack.SnackHeadImageView
+        android:id="@+id/snack_head"
+        android:layout_width="100px"
+        android:layout_height="100px"
+        app:layout_editor_absoluteX="-200px"
+        app:layout_editor_absoluteY="-200px" />
+
+    <RelativeLayout
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginBottom="30dp"
+        android:background="@color/transparent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/dire_up"
+            android:layout_width="@dimen/dire_size"
+            android:layout_height="@dimen/dire_size"
+            android:layout_centerHorizontal="true" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/dire_left"
+            android:layout_width="@dimen/dire_size"
+            android:layout_height="@dimen/dire_size"
+            android:layout_centerVertical="true" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/dire_down"
+            android:layout_width="@dimen/dire_size"
+            android:layout_height="@dimen/dire_size"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/dire_right"
+            android:layout_width="@dimen/dire_size"
+            android:layout_height="@dimen/dire_size"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true" />
+
+    </RelativeLayout>
+
+
+    <TextView
+        android:id="@+id/tv_a_eatCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginRight="80dp"
+        android:text="分数: "
+        android:textSize="30dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_eatCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="0"
+        android:textSize="30dp"
+        app:layout_constraintStart_toEndOf="@id/tv_a_eatCount"
+        app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
