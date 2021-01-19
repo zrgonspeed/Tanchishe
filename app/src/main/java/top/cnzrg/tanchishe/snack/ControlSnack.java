@@ -81,6 +81,8 @@ public class ControlSnack implements IControlSnack {
 
         mContext = null;
         mView = null;
+
+        instance = null;
     }
 
     public Snack getSnack() {

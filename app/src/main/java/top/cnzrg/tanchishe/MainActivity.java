@@ -7,9 +7,6 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.View;
@@ -23,12 +20,13 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.security.SecureRandom;
-import java.text.BreakIterator;
+import java.util.List;
 
 import top.cnzrg.tanchishe.goal.CollGoal;
 import top.cnzrg.tanchishe.goal.ControlGoal;
-import top.cnzrg.tanchishe.goal.Goal;
 import top.cnzrg.tanchishe.goal.IControlGoalView;
+import top.cnzrg.tanchishe.goal.other.BigBabyGoalView;
+import top.cnzrg.tanchishe.goal.other.ShanXianGoalView;
 import top.cnzrg.tanchishe.param.Direction;
 import top.cnzrg.tanchishe.param.GameData;
 import top.cnzrg.tanchishe.snack.CollSnack;
@@ -38,12 +36,11 @@ import top.cnzrg.tanchishe.snack.Snack;
 import top.cnzrg.tanchishe.snack.SnackHeadImageView;
 import top.cnzrg.tanchishe.util.DebugUtils;
 import top.cnzrg.tanchishe.util.Logger;
+import top.cnzrg.tanchishe.util.ThreadManager;
 import top.cnzrg.tanchishe.util.ToastUtils;
 import top.cnzrg.tanchishe.util.WindowUtils;
 
-import static top.cnzrg.tanchishe.snack.SnackHeadImageView.getRoundBitmapByShader;
-
-public class MainActivity extends Activity implements GameFlow, RunningParam.CollDetect, RunningParam.TurnToCallBack, IControlSnackView, IControlGoalView {
+public class MainActivity extends Activity implements GameFlow, RunningParam.ShanXianCallBack, RunningParam.CollDetect, RunningParam.TurnToCallBack, IControlSnackView, IControlGoalView {
     private ControlSnack controlSnack;
     private ControlGoal controlGoal;
 
@@ -54,7 +51,6 @@ public class MainActivity extends Activity implements GameFlow, RunningParam.Col
     private FloatingActionButton dire_down;
     private FloatingActionButton dire_left;
 
-    private CollGoal collGoal;
     private CollSnack collSnackHead;
     private CollSnack lastBody;
     private ConstraintLayout game_scene;
@@ -107,6 +103,7 @@ public class MainActivity extends Activity implements GameFlow, RunningParam.Col
 
         mRunningParam.setTurnToCallBack(this);
         mRunningParam.setCollDetectCallBack(this);
+        mRunningParam.setShanXianCallBack(this);
     }
 
     private boolean released = false;
@@ -151,7 +148,6 @@ public class MainActivity extends Activity implements GameFlow, RunningParam.Col
     private void release() {
         Logger.i(TAG, "释放资源");
 
-        collGoal = null;
         collSnackHead = null;
         lastBody = null;
         snack_head = null;
@@ -162,7 +158,6 @@ public class MainActivity extends Activity implements GameFlow, RunningParam.Col
         this.dire_up = null;
 
         controlSnack.unRegisterSnack();
-        controlGoal.unRegisterGoal();
 
         controlSnack.destory();
         controlGoal.destory();
@@ -195,6 +190,8 @@ public class MainActivity extends Activity implements GameFlow, RunningParam.Col
         mRunningParam.gameStatus = GameData.STATUS_STOP;
         mRunningParam.isRunning = false;
         mRunningParam.end();
+
+//        ThreadManager.getInstance().destory();
     }
 
     private boolean isFirst = true;
@@ -281,9 +278,6 @@ public class MainActivity extends Activity implements GameFlow, RunningParam.Col
 
 
     private void gameStart() {
-        // 随机出现一个目标
-        createCollGoal();
-
         // 蛇的碰撞体设置
         createCollSnack();
 
@@ -291,6 +285,9 @@ public class MainActivity extends Activity implements GameFlow, RunningParam.Col
         mRunningParam.gameStatus = GameData.STATUS_RUNNING;
 
         mRunningParam.startRefreshData();
+
+        // 随机出现一个目标
+        createCollGoal();
     }
 
     private void createCollSnack() {
@@ -302,7 +299,48 @@ public class MainActivity extends Activity implements GameFlow, RunningParam.Col
 
     SecureRandom random = new SecureRandom();
 
-    private void createCollGoal() {
+    private void createShanXianCollGoal() {
+        // 闪现---------------------------------
+        ShanXianGoalView shanXianGoalView = new ShanXianGoalView(this);
+        shanXianGoalView.setImageResource(R.drawable.goal);
+        shanXianGoalView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        // 设为负数表示不在屏幕上显示，避免一开始出现在屏幕上突然闪到下个左边
+        shanXianGoalView.setX(-200);
+        shanXianGoalView.setY(-200);
+        shanXianGoalView.setLayoutParams(new ConstraintLayout.LayoutParams(GameData.GOAL_WIDTH_HEIGHT, GameData.GOAL_WIDTH_HEIGHT));
+
+        game_scene.addView(shanXianGoalView);
+
+        // 碰撞目标 设置
+        CollGoal collGoal = getControlGoal().newCollGoal(shanXianGoalView);
+
+        Logger.i(TAG, "createCollGoal()------目标生成:" + collGoal.getName() + "  " + shanXianGoalView.getX() + " - " + shanXianGoalView.getY());
+
+        // 闪现线程
+        mRunningParam.startShanXian(collGoal);
+
+    }
+
+    private void createBigCollGoal() {
+        // 大图片----------------------------------
+        BigBabyGoalView bigBabyGoalView = new BigBabyGoalView(this);
+        bigBabyGoalView.setImageResource(R.drawable.goal);
+        bigBabyGoalView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        bigBabyGoalView.setX(random.nextInt(GameData.SCENE_WIDTH - GameData.GOAL_WIDTH_HEIGHT + 1));
+        bigBabyGoalView.setY(random.nextInt(GameData.SCENE_HEIGHT - GameData.GOAL_WIDTH_HEIGHT + 1));
+        bigBabyGoalView.setLayoutParams(new ConstraintLayout.LayoutParams(GameData.GOAL_BIG_WIDTH_HEIGHT, GameData.GOAL_BIG_WIDTH_HEIGHT));
+
+        game_scene.addView(bigBabyGoalView);
+
+        // 碰撞目标 设置
+        CollGoal collGoal = getControlGoal().newCollGoal(bigBabyGoalView);
+
+        Logger.i(TAG, "createCollGoal()------目标生成:" + collGoal.getName() + "  " + bigBabyGoalView.getX() + " - " + bigBabyGoalView.getY());
+    }
+
+
+    private void createNormalCollGoal() {
+        //------------------------常规goal
         // 目标图片
         ImageView goalView = new ImageView(this);
         goalView.setImageResource(R.drawable.goal);
@@ -316,11 +354,28 @@ public class MainActivity extends Activity implements GameFlow, RunningParam.Col
         game_scene.addView(goalView);
 
         // 碰撞目标 设置
-        collGoal = new CollGoal();
-        collGoal.setGoal(getControlGoal().getGoal());
-        collGoal.setView(goalView);
+        CollGoal collGoal = getControlGoal().newCollGoal(goalView);
 
         Logger.i(TAG, "createCollGoal()------目标生成:" + collGoal.getName() + "  " + goalView.getX() + " - " + goalView.getY());
+    }
+
+    private void createCollGoal() {
+        mRunningParam.goalMode = random.nextInt(3);
+
+        if (mRunningParam.goalMode == 0) {
+            createNormalCollGoal();
+            Logger.i(TAG, "当前目标类型: 普通");
+        }
+
+        if (mRunningParam.goalMode == 1) {
+            createBigCollGoal();
+            Logger.i(TAG, "当前目标类型: 大宝贝");
+        }
+
+        if (mRunningParam.goalMode == 2) {
+            createShanXianCollGoal();
+            Logger.i(TAG, "当前目标类型: 闪现");
+        }
     }
 
     private void initControlSnack() {
@@ -332,7 +387,6 @@ public class MainActivity extends Activity implements GameFlow, RunningParam.Col
 
     private void initControlGoal() {
         controlGoal = getControlGoal();
-        controlGoal.registerGoal(new Goal());
         controlGoal.setContext(getApplicationContext());
         controlGoal.setView(this);
     }
@@ -491,23 +545,12 @@ public class MainActivity extends Activity implements GameFlow, RunningParam.Col
         return collSnackHead;
     }
 
-    @Override
-    public CollGoal getCollGoal() {
-        return collGoal;
-    }
-
     private int a = 0;
 
     @Override
-    public void collision() {
+    public void collision(CollGoal collGoal) {
         Logger.i(TAG, "相撞");
         game_scene.removeView(collGoal.getView());
-
-        collGoal = null;
-        getControlGoal().unRegisterGoal();
-        Goal goal = new Goal();
-        goal.setName("目标-" + ++GameData.GOAL_COUNT);
-        getControlGoal().registerGoal(goal);
 
         createCollGoal();
 
@@ -565,5 +608,15 @@ public class MainActivity extends Activity implements GameFlow, RunningParam.Col
         // 吃到目标后，数据刷新
         int eatGoalCount = mRunningParam.getEatGoalCount();
         tv_eatCount.setText("" + eatGoalCount);
+    }
+
+    @Override
+    public List<CollGoal> getCollGoals() {
+        return getControlGoal().getCollGoals();
+    }
+
+    @Override
+    public void shanxian(CollGoal collGoal) {
+        collGoal.setXY(random.nextInt(GameData.SCENE_WIDTH - GameData.GOAL_WIDTH_HEIGHT + 1), random.nextInt(GameData.SCENE_HEIGHT - GameData.GOAL_WIDTH_HEIGHT + 1));
     }
 }

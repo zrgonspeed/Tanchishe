@@ -50,4 +50,18 @@ public class CollGoal implements ICollision {
     public String getName() {
         return goal.getName() + "-col";
     }
+
+    public void setXY(float x, float y) {
+        view.setX(x);
+        view.setY(y);
+    }
+
+    private boolean over = false;
+    public boolean isOver() {
+        return over;
+    }
+
+    public void setOver(boolean over) {
+        this.over = over;
+    }
 }

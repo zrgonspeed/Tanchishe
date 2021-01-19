@@ -3,8 +3,12 @@ package top.cnzrg.tanchishe.goal;
 import android.content.Context;
 import android.widget.ImageView;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import top.cnzrg.tanchishe.param.GameData;
+
 public class ControlGoal implements IControlGoal {
-    private Goal goal;
     private Context mContext;
     private IControlGoalView mView;
     private static ControlGoal instance;
@@ -34,22 +38,20 @@ public class ControlGoal implements IControlGoal {
 
     @Override
     public void registerGoal(Goal goal) {
-        this.goal = goal;
     }
 
     @Override
     public void unRegisterGoal() {
-        this.goal = null;
     }
 
     @Override
     public void setSize(int size) {
-        goal.setSize(size);
+
     }
 
     @Override
     public int getSize() {
-        return goal.getSize();
+        return 0;
     }
 
     @Override
@@ -61,9 +63,39 @@ public class ControlGoal implements IControlGoal {
     public void destory() {
         mContext = null;
         mView = null;
+
+        collGoals.clear();
+        collGoals = null;
+
+        instance = null;
     }
 
-    public Goal getGoal() {
+    private List<CollGoal> collGoals = new ArrayList<>();
+
+    public CollGoal getCollGoal(int i) {
+        return collGoals.get(i);
+    }
+
+    public void addCollGoal(CollGoal collGoal) {
+        collGoals.add(collGoal);
+    }
+
+    public CollGoal newCollGoal(ImageView view) {
+        CollGoal collGoal = new CollGoal();
+        collGoal.setGoal(createGoal());
+        collGoal.setView(view);
+
+        collGoals.add(collGoal);
+        return collGoal;
+    }
+
+    private Goal createGoal() {
+        Goal goal = new Goal();
+        goal.setName("目标-" + ++GameData.GOAL_COUNT);
         return goal;
+    }
+
+    public List<CollGoal> getCollGoals() {
+        return collGoals;
     }
 }
