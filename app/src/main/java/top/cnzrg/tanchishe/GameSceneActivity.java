@@ -42,6 +42,7 @@ import top.cnzrg.tanchishe.snack.Snack;
 import top.cnzrg.tanchishe.snack.SnackHeadImageView;
 import top.cnzrg.tanchishe.util.DebugUtils;
 import top.cnzrg.tanchishe.util.Logger;
+import top.cnzrg.tanchishe.util.ThreadManager;
 import top.cnzrg.tanchishe.util.ToastUtils;
 import top.cnzrg.tanchishe.util.WindowUtils;
 
@@ -196,7 +197,9 @@ public class GameSceneActivity extends Activity implements GameFlow, RunningPara
         mRunningParam.isRunning = false;
         mRunningParam.end();
 
-//        ThreadManager.getInstance().destory();
+        GoalRunningParam.getInstance().destory();
+
+        ThreadManager.getInstance().destory();
     }
 
     private boolean isFirst = true;
@@ -306,8 +309,27 @@ public class GameSceneActivity extends Activity implements GameFlow, RunningPara
     private SecureRandom random = new SecureRandom();
 
     private void createMoveCollGoal() {
+        //------------------------移动goal
+        // 目标图片
+        ImageView goalView = new ImageView(this);
+        goalView.setImageResource(R.drawable.goal);
+        goalView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        goalView.setX(random.nextInt(GameData.SCENE_WIDTH - GameData.GOAL_WIDTH_HEIGHT + 1));
+        goalView.setY(random.nextInt(GameData.SCENE_HEIGHT - GameData.GOAL_WIDTH_HEIGHT + 1));
 
+        goalView.setLayoutParams(new ConstraintLayout.LayoutParams(GameData.GOAL_WIDTH_HEIGHT, GameData.GOAL_WIDTH_HEIGHT));
+
+        // 往容器添加view
+        game_scene.addView(goalView);
+
+        // 碰撞目标 设置
+        CollGoal collGoal = getControlGoal().newCollGoal(goalView);
+
+        GoalRunningParam.getInstance().start(collGoal);
+
+        Logger.i(TAG, "createCollGoal()------目标生成:" + collGoal.getName() + "  " + goalView.getX() + " - " + goalView.getY());
     }
+
 
 
     private void createShanXianCollGoal() {
@@ -398,7 +420,7 @@ public class GameSceneActivity extends Activity implements GameFlow, RunningPara
 
     private void createCollGoal() {
         // TODO: 2021/1/19
-        mRunningParam.goalMode = random.nextInt(3);
+        mRunningParam.goalMode = random.nextInt(4);
 
         if (mRunningParam.goalMode == 0) {
             createNormalCollGoal();
@@ -413,6 +435,11 @@ public class GameSceneActivity extends Activity implements GameFlow, RunningPara
         if (mRunningParam.goalMode == 2) {
             createShanXianCollGoal();
             Logger.i(TAG, "当前目标类型: 闪现");
+        }
+
+        if (mRunningParam.goalMode == 3) {
+            createMoveCollGoal();
+            Logger.i(TAG, "当前目标类型: 移动");
         }
     }
 

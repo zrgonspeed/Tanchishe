@@ -121,7 +121,7 @@ public class RunningParam {
             collDetectThread.interrupt();
             collDetectThread = null;
         }
-        ThreadManager.getInstance().destory();
+//        ThreadManager.getInstance().destory();
     }
 
     public void setCollDetectCallBack(CollDetect collDetect) {
