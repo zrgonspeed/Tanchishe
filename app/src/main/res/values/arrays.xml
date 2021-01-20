@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer-array name="goal_drawable">
+        <item>@drawable/body1</item>
+        <item>@drawable/body2</item>
+        <item>@drawable/body3</item>
+        <item>@drawable/body4</item>
+        <item>@drawable/body5</item>
+        <item>@drawable/body6</item>
+        <item>@drawable/body7</item>
+        <item>@drawable/body8</item>
+    </integer-array>
+</resources>

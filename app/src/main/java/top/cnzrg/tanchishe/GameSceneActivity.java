@@ -39,6 +39,7 @@ import top.cnzrg.tanchishe.snack.IControlSnackView;
 import top.cnzrg.tanchishe.snack.Snack;
 import top.cnzrg.tanchishe.snack.SnackHeadImageView;
 import top.cnzrg.tanchishe.util.DebugUtils;
+import top.cnzrg.tanchishe.util.ImageViewUtils;
 import top.cnzrg.tanchishe.util.Logger;
 import top.cnzrg.tanchishe.util.ThreadManager;
 import top.cnzrg.tanchishe.util.ToastUtils;
@@ -64,6 +65,8 @@ public class GameSceneActivity extends Activity implements GameFlow, RunningPara
 
     private String TAG;
     private TextView tv_eatCount;
+
+    private int[] goalDrawable;
 
     /**
      * 防止横屏闪退
@@ -254,6 +257,8 @@ public class GameSceneActivity extends Activity implements GameFlow, RunningPara
         tv_eatCount = findViewById(R.id.tv_eatCount);
 
         fab_pause = findViewById(R.id.fab_pause);
+
+        goalDrawable = ImageViewUtils.getGoalDrawable(getApplicationContext(), R.array.goal_drawable);
     }
 
     private void initListener() {
@@ -329,7 +334,7 @@ public class GameSceneActivity extends Activity implements GameFlow, RunningPara
         //------------------------移动goal
         // 目标图片
         ImageView goalView = new ImageView(this);
-        goalView.setImageResource(arr[random.nextInt(8)]);
+        goalView.setImageResource(goalDrawable[random.nextInt(8)]);
         goalView.setScaleType(ImageView.ScaleType.FIT_CENTER);
         goalView.setX(random.nextInt(GameData.SCENE_WIDTH - GameData.GOAL_WIDTH_HEIGHT + 1));
         goalView.setY(random.nextInt(GameData.SCENE_HEIGHT - GameData.GOAL_WIDTH_HEIGHT + 1));
@@ -351,7 +356,7 @@ public class GameSceneActivity extends Activity implements GameFlow, RunningPara
         //------------------------移动goal
         // 目标图片
         ImageView goalView = new ImageView(this);
-        goalView.setImageResource(arr[random.nextInt(8)]);
+        goalView.setImageResource(goalDrawable[random.nextInt(8)]);
         goalView.setScaleType(ImageView.ScaleType.FIT_CENTER);
         goalView.setX(random.nextInt(GameData.SCENE_WIDTH - GameData.GOAL_WIDTH_HEIGHT + 1));
         goalView.setY(random.nextInt(GameData.SCENE_HEIGHT - GameData.GOAL_WIDTH_HEIGHT + 1));
@@ -374,7 +379,7 @@ public class GameSceneActivity extends Activity implements GameFlow, RunningPara
     private void createShanXianCollGoal() {
         // 闪现---------------------------------
         ShanXianGoalView shanXianGoalView = new ShanXianGoalView(this);
-        shanXianGoalView.setImageResource(arr[random.nextInt(8)]);
+        shanXianGoalView.setImageResource(goalDrawable[random.nextInt(8)]);
         shanXianGoalView.setScaleType(ImageView.ScaleType.FIT_CENTER);
         // 设为负数表示不在屏幕上显示，避免一开始出现在屏幕上突然闪到下个左边
         shanXianGoalView.setX(-200);
@@ -396,7 +401,7 @@ public class GameSceneActivity extends Activity implements GameFlow, RunningPara
     private void createBigCollGoal() {
         // 大图片----------------------------------
         BigBabyGoalView bigBabyGoalView = new BigBabyGoalView(this);
-        bigBabyGoalView.setImageResource(arr[random.nextInt(8)]);
+        bigBabyGoalView.setImageResource(goalDrawable[random.nextInt(8)]);
         bigBabyGoalView.setScaleType(ImageView.ScaleType.FIT_CENTER);
         bigBabyGoalView.setX(random.nextInt(GameData.SCENE_WIDTH - GameData.GOAL_WIDTH_HEIGHT + 1));
         bigBabyGoalView.setY(random.nextInt(GameData.SCENE_HEIGHT - GameData.GOAL_WIDTH_HEIGHT + 1));
@@ -441,7 +446,7 @@ public class GameSceneActivity extends Activity implements GameFlow, RunningPara
         //------------------------常规goal
         // 目标图片
         ImageView goalView = new ImageView(this);
-        goalView.setImageResource(arr[random.nextInt(8)]);
+        goalView.setImageResource(goalDrawable[random.nextInt(8)]);
         goalView.setScaleType(ImageView.ScaleType.FIT_CENTER);
         goalView.setX(random.nextInt(GameData.SCENE_WIDTH - GameData.GOAL_WIDTH_HEIGHT + 1));
         goalView.setY(random.nextInt(GameData.SCENE_HEIGHT - GameData.GOAL_WIDTH_HEIGHT + 1));
@@ -654,18 +659,6 @@ public class GameSceneActivity extends Activity implements GameFlow, RunningPara
         return collSnackHead;
     }
 
-    private int a = 0;
-
-    int[] arr = {
-            R.drawable.body1,
-            R.drawable.body2,
-            R.drawable.body3,
-            R.drawable.body4,
-            R.drawable.body5,
-            R.drawable.body6,
-            R.drawable.body7,
-            R.drawable.body8,
-    };
 
     @Override
     public void collision(CollGoal collGoal) {
