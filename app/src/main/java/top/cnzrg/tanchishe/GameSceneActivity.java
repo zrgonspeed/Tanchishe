@@ -311,7 +311,7 @@ public class GameSceneActivity extends Activity implements GameFlow, RunningPara
         //------------------------移动goal
         // 目标图片
         ImageView goalView = new ImageView(this);
-        goalView.setImageResource(R.drawable.snack_body);
+        goalView.setImageResource(arr[random.nextInt(8)]);
         goalView.setScaleType(ImageView.ScaleType.FIT_CENTER);
         goalView.setX(random.nextInt(GameData.SCENE_WIDTH - GameData.GOAL_WIDTH_HEIGHT + 1));
         goalView.setY(random.nextInt(GameData.SCENE_HEIGHT - GameData.GOAL_WIDTH_HEIGHT + 1));
@@ -333,7 +333,7 @@ public class GameSceneActivity extends Activity implements GameFlow, RunningPara
         //------------------------移动goal
         // 目标图片
         ImageView goalView = new ImageView(this);
-        goalView.setImageResource(R.drawable.goal);
+        goalView.setImageResource(arr[random.nextInt(8)]);
         goalView.setScaleType(ImageView.ScaleType.FIT_CENTER);
         goalView.setX(random.nextInt(GameData.SCENE_WIDTH - GameData.GOAL_WIDTH_HEIGHT + 1));
         goalView.setY(random.nextInt(GameData.SCENE_HEIGHT - GameData.GOAL_WIDTH_HEIGHT + 1));
@@ -356,7 +356,7 @@ public class GameSceneActivity extends Activity implements GameFlow, RunningPara
     private void createShanXianCollGoal() {
         // 闪现---------------------------------
         ShanXianGoalView shanXianGoalView = new ShanXianGoalView(this);
-        shanXianGoalView.setImageResource(R.drawable.goal);
+        shanXianGoalView.setImageResource(arr[random.nextInt(8)]);
         shanXianGoalView.setScaleType(ImageView.ScaleType.FIT_CENTER);
         // 设为负数表示不在屏幕上显示，避免一开始出现在屏幕上突然闪到下个左边
         shanXianGoalView.setX(-200);
@@ -378,7 +378,7 @@ public class GameSceneActivity extends Activity implements GameFlow, RunningPara
     private void createBigCollGoal() {
         // 大图片----------------------------------
         BigBabyGoalView bigBabyGoalView = new BigBabyGoalView(this);
-        bigBabyGoalView.setImageResource(R.drawable.goal);
+        bigBabyGoalView.setImageResource(arr[random.nextInt(8)]);
         bigBabyGoalView.setScaleType(ImageView.ScaleType.FIT_CENTER);
         bigBabyGoalView.setX(random.nextInt(GameData.SCENE_WIDTH - GameData.GOAL_WIDTH_HEIGHT + 1));
         bigBabyGoalView.setY(random.nextInt(GameData.SCENE_HEIGHT - GameData.GOAL_WIDTH_HEIGHT + 1));
@@ -423,7 +423,7 @@ public class GameSceneActivity extends Activity implements GameFlow, RunningPara
         //------------------------常规goal
         // 目标图片
         ImageView goalView = new ImageView(this);
-        goalView.setImageResource(R.drawable.goal);
+        goalView.setImageResource(arr[random.nextInt(8)]);
         goalView.setScaleType(ImageView.ScaleType.FIT_CENTER);
         goalView.setX(random.nextInt(GameData.SCENE_WIDTH - GameData.GOAL_WIDTH_HEIGHT + 1));
         goalView.setY(random.nextInt(GameData.SCENE_HEIGHT - GameData.GOAL_WIDTH_HEIGHT + 1));
@@ -638,6 +638,17 @@ public class GameSceneActivity extends Activity implements GameFlow, RunningPara
 
     private int a = 0;
 
+    int[] arr = {
+            R.drawable.body1,
+            R.drawable.body2,
+            R.drawable.body3,
+            R.drawable.body4,
+            R.drawable.body5,
+            R.drawable.body6,
+            R.drawable.body7,
+            R.drawable.body8,
+    };
+
     @Override
     public void collision(CollGoal collGoal) {
         Logger.i(TAG, "相撞");
@@ -660,21 +671,9 @@ public class GameSceneActivity extends Activity implements GameFlow, RunningPara
         // snack实体还是通用
         body.setSnack(getControlSnack().getSnack());
 
-        int[] arr = {
-                R.drawable.body1,
-                R.drawable.body2,
-                R.drawable.body3,
-                R.drawable.body4,
-                R.drawable.body5,
-                R.drawable.body6,
-                R.drawable.body7,
-                R.drawable.body8,
-        };
-
-
         // 身体图片
         ImageView bodyView = new ImageView(GameSceneActivity.this);
-        bodyView.setImageResource(arr[a++]);
+        bodyView.setImageDrawable(collGoal.getView().getDrawable());
         bodyView.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
         // 设置身体图片宽高

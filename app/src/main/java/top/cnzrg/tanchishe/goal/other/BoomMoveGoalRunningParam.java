@@ -65,19 +65,19 @@ public class BoomMoveGoalRunningParam {
 
                 dire = random.nextInt(4) + 1;
                 count = random.nextInt(10) + 3;
-
-                for (int i = 0; i < count; i++) {
-                    try {
+                try {
+                    for (int i = 0; i < count; i++) {
                         Message message = new Message();
                         message.obj = collGoal;
                         message.what = dire;
                         moveCollHandler.sendMessage(message);
 
                         Thread.sleep(moveInterval);
-                    } catch (InterruptedException e) {
-                        Logger.w(TAG, "目标移动线程中断");
-                        break;
+
                     }
+                } catch (InterruptedException e) {
+                    Logger.w(TAG, "炸弹目标移动线程中断");
+                    break;
                 }
             }
 
