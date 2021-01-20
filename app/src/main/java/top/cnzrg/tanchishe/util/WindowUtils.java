@@ -1,5 +1,6 @@
 package top.cnzrg.tanchishe.util;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Build;
 import android.view.View;
@@ -24,6 +25,7 @@ public class WindowUtils {
         }
     }
 
+    @SuppressLint("ResourceAsColor")
     public static void fillRightAndBottom(Context context, ViewGroup group, int width, int height) {
         // 填充屏幕右边和下边
         View view = new View(context);

@@ -12,6 +12,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -301,7 +302,13 @@ public class GameSceneActivity extends Activity implements GameFlow, RunningPara
         collSnackHead.setXY(300f, 300f);
     }
 
-    SecureRandom random = new SecureRandom();
+    // 随机数安排
+    private SecureRandom random = new SecureRandom();
+
+    private void createMoveCollGoal() {
+
+    }
+
 
     private void createShanXianCollGoal() {
         // 闪现---------------------------------
@@ -350,6 +357,9 @@ public class GameSceneActivity extends Activity implements GameFlow, RunningPara
 
             @Override
             public void onAnimationEnd(Animation animation) {
+                if (collGoal.isOver()) {
+                    return;
+                }
                 game_scene.removeView(bigBabyGoalView);
                 collGoal.setOver(true);
                 createCollGoal();
