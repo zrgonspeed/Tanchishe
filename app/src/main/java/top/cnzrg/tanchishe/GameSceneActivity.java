@@ -55,6 +55,8 @@ public class GameSceneActivity extends Activity implements GameFlow, RunningPara
     private FloatingActionButton dire_down;
     private FloatingActionButton dire_left;
 
+    private FloatingActionButton fab_pause;
+
     private CollSnack collSnackHead;
     private CollSnack lastBody;
     private ConstraintLayout game_scene;
@@ -250,6 +252,8 @@ public class GameSceneActivity extends Activity implements GameFlow, RunningPara
         dire_left = findViewById(R.id.dire_left);
 
         tv_eatCount = findViewById(R.id.tv_eatCount);
+
+        fab_pause = findViewById(R.id.fab_pause);
     }
 
     private void initListener() {
@@ -281,8 +285,22 @@ public class GameSceneActivity extends Activity implements GameFlow, RunningPara
                 mRunningParam.direction = Direction.DIRECTION_LEFT;
             }
         });
+
+        fab_pause.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isRunning()) {
+                    gamePause();
+                } else {
+                    gameResume();
+                }
+            }
+        });
     }
 
+    private boolean isRunning() {
+        return mRunningParam.gameStatus == GameData.STATUS_RUNNING;
+    }
 
     private void gameStart() {
         // 蛇的碰撞体设置
