@@ -177,6 +177,8 @@ public class GameSceneActivity extends Activity implements GameFlow, RunningPara
         mRunningParam = null;
 
         ToastUtils.destory();
+
+        game_scene.removeAllViews();
     }
 
     public void gamePause() {
@@ -672,8 +674,30 @@ public class GameSceneActivity extends Activity implements GameFlow, RunningPara
             animation = null;
         }
 
+        //动画效果参数直接定义
+        Animation animation2 = new AlphaAnimation(1.0f, 0.1f);
+        animation2.setDuration(200);
+        animation2.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                view.setAnimation(null);
+                game_scene.removeView(view);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        view.setAnimation(animation2);
+
         // 场景移除图片
-        game_scene.removeView(collGoal.getView());
+//        game_scene.removeView(collGoal.getView());
 
         createCollGoal();
 
