@@ -1,6 +1,9 @@
 package top.cnzrg.tanchishe;
 
 
+import android.animation.ArgbEvaluator;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
@@ -10,6 +13,8 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -334,6 +339,29 @@ public class GameSceneActivity extends Activity implements GameFlow, RunningPara
         // 碰撞目标 设置
         CollGoal collGoal = getControlGoal().newCollGoal(bigBabyGoalView);
 
+        //动画效果参数直接定义
+        Animation animation = new AlphaAnimation(0.1f, 1.0f);
+        animation.setDuration(3000);
+        animation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                game_scene.removeView(bigBabyGoalView);
+                collGoal.setOver(true);
+                createCollGoal();
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        bigBabyGoalView.setAnimation(animation);
+
         Logger.i(TAG, "createCollGoal()------目标生成:" + collGoal.getName() + "  " + bigBabyGoalView.getX() + " - " + bigBabyGoalView.getY());
     }
 
@@ -359,6 +387,7 @@ public class GameSceneActivity extends Activity implements GameFlow, RunningPara
     }
 
     private void createCollGoal() {
+        // TODO: 2021/1/19
         mRunningParam.goalMode = random.nextInt(3);
 
         if (mRunningParam.goalMode == 0) {
@@ -549,6 +578,16 @@ public class GameSceneActivity extends Activity implements GameFlow, RunningPara
     @Override
     public void collision(CollGoal collGoal) {
         Logger.i(TAG, "相撞");
+        // 移除图片动画
+        ImageView view = collGoal.getView();
+        Animation animation = view.getAnimation();
+        if (animation != null) {
+            animation.cancel();
+            view.clearAnimation();
+            animation = null;
+        }
+
+        // 场景移除图片
         game_scene.removeView(collGoal.getView());
 
         createCollGoal();

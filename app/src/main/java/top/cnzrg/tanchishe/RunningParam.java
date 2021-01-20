@@ -252,7 +252,6 @@ public class RunningParam {
 
     public int goalMode = 2;
 
-
     private class ShanXianCollGoalThread extends Thread {
         private CollGoal collGoal;
 
@@ -266,7 +265,7 @@ public class RunningParam {
 
         @Override
         public void run() {
-            while (goalMode == 2 && !collGoal.isOver() && isRunning) {
+            while (!collGoal.isOver() && isRunning) {
                 if (gameStatus != GameData.STATUS_RUNNING) {
                     continue;
                 }
