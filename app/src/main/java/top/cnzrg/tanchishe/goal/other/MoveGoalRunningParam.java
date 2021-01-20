@@ -1,4 +1,4 @@
-package top.cnzrg.tanchishe;
+package top.cnzrg.tanchishe.goal.other;
 
 import android.os.Handler;
 import android.os.Message;
@@ -7,15 +7,16 @@ import android.widget.ImageView;
 import java.lang.ref.WeakReference;
 import java.security.SecureRandom;
 
+import top.cnzrg.tanchishe.RunningParam;
 import top.cnzrg.tanchishe.goal.CollGoal;
 import top.cnzrg.tanchishe.param.Direction;
 import top.cnzrg.tanchishe.param.GameData;
 import top.cnzrg.tanchishe.util.Logger;
 import top.cnzrg.tanchishe.util.ThreadManager;
 
-public class GoalRunningParam {
-    public static String TAG = "GoalRunningParam";
-    private static GoalRunningParam instance;
+public class MoveGoalRunningParam {
+    public static String TAG = "MoveGoalRunningParam";
+    private static MoveGoalRunningParam instance;
     // 随机数安排
     private SecureRandom random = new SecureRandom();
 
@@ -26,7 +27,7 @@ public class GoalRunningParam {
     private static int moveDist = 20;
     private static int moveInterval = 100;
 
-    private GoalRunningParam() {
+    private MoveGoalRunningParam() {
         moveCollHandler = new MoveCollHandler(this);
     }
 
@@ -74,7 +75,7 @@ public class GoalRunningParam {
 
                         Thread.sleep(moveInterval);
                     } catch (InterruptedException e) {
-                        Logger.w(TAG, "目标移动线程中断");
+                        Logger.w(TAG, "目标炸弹移动线程中断");
                         break;
                     }
                 }
@@ -86,10 +87,10 @@ public class GoalRunningParam {
     }
 
     private static class MoveCollHandler extends Handler {
-        private WeakReference<GoalRunningParam> weakReference;
-        private GoalRunningParam mRunningParam;
+        private WeakReference<MoveGoalRunningParam> weakReference;
+        private MoveGoalRunningParam mRunningParam;
 
-        MoveCollHandler(GoalRunningParam mRunningParam) {
+        MoveCollHandler(MoveGoalRunningParam mRunningParam) {
             if (mRunningParam != null) {
                 weakReference = new WeakReference<>(mRunningParam);
             }
@@ -145,11 +146,11 @@ public class GoalRunningParam {
         return true;
     }
 
-    public static GoalRunningParam getInstance() {
+    public static MoveGoalRunningParam getInstance() {
         if (instance == null) {
-            synchronized (GoalRunningParam.class) {
+            synchronized (MoveGoalRunningParam.class) {
                 if (instance == null) {
-                    instance = new GoalRunningParam();
+                    instance = new MoveGoalRunningParam();
                 }
             }
         }

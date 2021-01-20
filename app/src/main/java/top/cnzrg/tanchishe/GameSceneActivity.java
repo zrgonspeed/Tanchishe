@@ -1,9 +1,6 @@
 package top.cnzrg.tanchishe;
 
 
-import android.animation.ArgbEvaluator;
-import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
@@ -12,7 +9,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -32,6 +28,8 @@ import top.cnzrg.tanchishe.goal.CollGoal;
 import top.cnzrg.tanchishe.goal.ControlGoal;
 import top.cnzrg.tanchishe.goal.IControlGoalView;
 import top.cnzrg.tanchishe.goal.other.BigBabyGoalView;
+import top.cnzrg.tanchishe.goal.other.BoomMoveGoalRunningParam;
+import top.cnzrg.tanchishe.goal.other.MoveGoalRunningParam;
 import top.cnzrg.tanchishe.goal.other.ShanXianGoalView;
 import top.cnzrg.tanchishe.param.Direction;
 import top.cnzrg.tanchishe.param.GameData;
@@ -197,7 +195,8 @@ public class GameSceneActivity extends Activity implements GameFlow, RunningPara
         mRunningParam.isRunning = false;
         mRunningParam.end();
 
-        GoalRunningParam.getInstance().destory();
+        MoveGoalRunningParam.getInstance().destory();
+        BoomMoveGoalRunningParam.getInstance().destory();
 
         ThreadManager.getInstance().destory();
     }
@@ -308,6 +307,28 @@ public class GameSceneActivity extends Activity implements GameFlow, RunningPara
     // 随机数安排
     private SecureRandom random = new SecureRandom();
 
+    private void createBoomMoveCollGoal() {
+        //------------------------移动goal
+        // 目标图片
+        ImageView goalView = new ImageView(this);
+        goalView.setImageResource(R.drawable.snack_body);
+        goalView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        goalView.setX(random.nextInt(GameData.SCENE_WIDTH - GameData.GOAL_WIDTH_HEIGHT + 1));
+        goalView.setY(random.nextInt(GameData.SCENE_HEIGHT - GameData.GOAL_WIDTH_HEIGHT + 1));
+
+        goalView.setLayoutParams(new ConstraintLayout.LayoutParams(GameData.GOAL_WIDTH_HEIGHT, GameData.GOAL_WIDTH_HEIGHT));
+
+        // 往容器添加view
+        game_scene.addView(goalView);
+
+        // 碰撞目标 设置
+        CollGoal collGoal = getControlGoal().newCollGoal(goalView);
+
+        BoomMoveGoalRunningParam.getInstance().start(collGoal);
+
+        Logger.i(TAG, "createCollGoal()------目标生成:" + collGoal.getName() + "  " + goalView.getX() + " - " + goalView.getY());
+    }
+
     private void createMoveCollGoal() {
         //------------------------移动goal
         // 目标图片
@@ -325,7 +346,7 @@ public class GameSceneActivity extends Activity implements GameFlow, RunningPara
         // 碰撞目标 设置
         CollGoal collGoal = getControlGoal().newCollGoal(goalView);
 
-        GoalRunningParam.getInstance().start(collGoal);
+        MoveGoalRunningParam.getInstance().start(collGoal);
 
         Logger.i(TAG, "createCollGoal()------目标生成:" + collGoal.getName() + "  " + goalView.getX() + " - " + goalView.getY());
     }
@@ -420,7 +441,7 @@ public class GameSceneActivity extends Activity implements GameFlow, RunningPara
 
     private void createCollGoal() {
         // TODO: 2021/1/19
-        mRunningParam.goalMode = random.nextInt(4);
+        mRunningParam.goalMode = random.nextInt(5);
 
         if (mRunningParam.goalMode == 0) {
             createNormalCollGoal();
@@ -440,6 +461,11 @@ public class GameSceneActivity extends Activity implements GameFlow, RunningPara
         if (mRunningParam.goalMode == 3) {
             createMoveCollGoal();
             Logger.i(TAG, "当前目标类型: 移动");
+        }
+
+        if (mRunningParam.goalMode == 4) {
+            createBoomMoveCollGoal();
+            Logger.i(TAG, "当前目标类型: 移动炸弹");
         }
     }
 
