@@ -6,7 +6,8 @@ import android.widget.ImageView;
 import java.util.ArrayList;
 import java.util.List;
 
-import top.cnzrg.tanchishe.goal.other.CollBoomGoal;
+import top.cnzrg.tanchishe.goal.other.BoomCollGoal;
+import top.cnzrg.tanchishe.goal.other.PropCollGoal;
 import top.cnzrg.tanchishe.param.GameData;
 
 public class ControlGoal implements IControlGoal {
@@ -100,8 +101,17 @@ public class ControlGoal implements IControlGoal {
         return collGoals;
     }
 
-    public CollBoomGoal newBoomCollGoal(ImageView view) {
-        CollBoomGoal collGoal = new CollBoomGoal();
+    public BoomCollGoal newBoomCollGoal(ImageView view) {
+        BoomCollGoal collGoal = new BoomCollGoal();
+        collGoal.setGoal(createGoal());
+        collGoal.setView(view);
+
+        collGoals.add(collGoal);
+        return collGoal;
+    }
+
+    public PropCollGoal newPropCollGoal(ImageView view) {
+        PropCollGoal collGoal = new PropCollGoal();
         collGoal.setGoal(createGoal());
         collGoal.setView(view);
 

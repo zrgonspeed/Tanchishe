@@ -3,7 +3,7 @@ package top.cnzrg.tanchishe.util;
 import android.content.Context;
 import android.content.res.TypedArray;
 
-public class ImageViewUtils {
+public class DrawableUtils {
     public static int[] getGoalDrawable(Context context, int arrayId) {
         TypedArray ar = context.getResources().obtainTypedArray(arrayId);
         int len = ar.length();

@@ -61,6 +61,7 @@ public class CollGoal implements ICollision {
     }
 
     private boolean over = false;
+
     public boolean isOver() {
         return over;
     }
@@ -68,4 +69,9 @@ public class CollGoal implements ICollision {
     public void setOver(boolean over) {
         this.over = over;
     }
+
+    public boolean isProp() {
+        return false;
+    }
+
 }

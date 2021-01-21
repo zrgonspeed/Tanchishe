@@ -37,12 +37,24 @@ public class RunningParam {
     private int eatGoalCount = 0;
     private GameOverCallBack mGameOverCallBack;
 
+    private CollPropCallBack mCollPropCallBack;
+    private PropCollBoomCallBack mPropCollBoomCallBack;
+
+    public void setCollPropCallBack(CollPropCallBack mCollPropCallBack) {
+        this.mCollPropCallBack = mCollPropCallBack;
+    }
+
+    public void setPropCollBoomCallBack(PropCollBoomCallBack mPropCollBoomCallBack) {
+        this.mPropCollBoomCallBack = mPropCollBoomCallBack;
+    }
+
     public int getEatGoalCount() {
         return eatGoalCount;
     }
 
     /**
      * 开始闪现
+     *
      * @param collGoal
      */
     public void startShanXian(CollGoal collGoal) {
@@ -77,6 +89,14 @@ public class RunningParam {
 
     interface GameOverCallBack {
         void boomColl(CollGoal collGoal);
+    }
+
+    interface CollPropCallBack {
+        void propColl(CollGoal collGoal);
+    }
+
+    interface PropCollBoomCallBack {
+        void propCollBoom(CollGoal collGoal);
     }
 
     private RunningParam() {
@@ -114,6 +134,8 @@ public class RunningParam {
         mCollDetectCallBack = null;
         mShanXianCallBack = null;
         mGameOverCallBack = null;
+        mPropCollBoomCallBack = null;
+        mCollPropCallBack = null;
 
         instance = null;
     }
@@ -176,6 +198,7 @@ public class RunningParam {
                 weakReference = new WeakReference<>(mRunningParam);
             }
         }
+
         @Override
         synchronized public void handleMessage(Message msg) {
             mRunningParam = weakReference.get();
@@ -220,6 +243,7 @@ public class RunningParam {
                 weakReference = new WeakReference<>(mRunningParam);
             }
         }
+
         @Override
         synchronized public void handleMessage(Message msg) {
             mRunningParam = weakReference.get();
@@ -250,7 +274,15 @@ public class RunningParam {
                     flag = true;
                     collGoal.setOver(true);
                     if (collGoal.isBoom()) {
-                        mRunningParam.mGameOverCallBack.boomColl(collGoal);
+                        if (collSnack.getCurProps() > 0) {
+                            // 多个虎头道具只有一次效果
+                            mRunningParam.mPropCollBoomCallBack.propCollBoom(collGoal);
+                        } else {
+                            mRunningParam.mGameOverCallBack.boomColl(collGoal);
+                        }
+                    } else if (collGoal.isProp()) {
+                        // 蛇头增加吃炸弹效果
+                        mRunningParam.mCollPropCallBack.propColl(collGoal);
                     } else {
                         // 吃到目标数计数
                         mRunningParam.eatGoalCount++;

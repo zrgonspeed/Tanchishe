@@ -30,8 +30,9 @@ import top.cnzrg.tanchishe.goal.ControlGoal;
 import top.cnzrg.tanchishe.goal.IControlGoalView;
 import top.cnzrg.tanchishe.goal.other.BigBabyGoalView;
 import top.cnzrg.tanchishe.goal.other.BoomMoveGoalRunningParam;
-import top.cnzrg.tanchishe.goal.other.CollBoomGoal;
+import top.cnzrg.tanchishe.goal.other.BoomCollGoal;
 import top.cnzrg.tanchishe.goal.other.MoveGoalRunningParam;
+import top.cnzrg.tanchishe.goal.other.PropCollGoal;
 import top.cnzrg.tanchishe.goal.other.ShanXianGoalView;
 import top.cnzrg.tanchishe.param.Direction;
 import top.cnzrg.tanchishe.param.GameData;
@@ -41,13 +42,13 @@ import top.cnzrg.tanchishe.snack.IControlSnackView;
 import top.cnzrg.tanchishe.snack.Snack;
 import top.cnzrg.tanchishe.snack.SnackHeadImageView;
 import top.cnzrg.tanchishe.util.DebugUtils;
-import top.cnzrg.tanchishe.util.ImageViewUtils;
+import top.cnzrg.tanchishe.util.DrawableUtils;
 import top.cnzrg.tanchishe.util.Logger;
 import top.cnzrg.tanchishe.util.ThreadManager;
 import top.cnzrg.tanchishe.util.ToastUtils;
 import top.cnzrg.tanchishe.util.WindowUtils;
 
-public class GameSceneActivity extends Activity implements RunningParam.GameOverCallBack, GameFlow, RunningParam.ShanXianCallBack, RunningParam.CollDetect, RunningParam.TurnToCallBack, IControlSnackView, IControlGoalView {
+public class GameSceneActivity extends Activity implements RunningParam.PropCollBoomCallBack, RunningParam.CollPropCallBack, RunningParam.GameOverCallBack, GameFlow, RunningParam.ShanXianCallBack, RunningParam.CollDetect, RunningParam.TurnToCallBack, IControlSnackView, IControlGoalView {
     private ControlSnack controlSnack;
     private ControlGoal controlGoal;
 
@@ -117,6 +118,8 @@ public class GameSceneActivity extends Activity implements RunningParam.GameOver
         mRunningParam.setCollDetectCallBack(this);
         mRunningParam.setShanXianCallBack(this);
         mRunningParam.setGameOverCallBack(this);
+        mRunningParam.setPropCollBoomCallBack(this);
+        mRunningParam.setCollPropCallBack(this);
     }
 
     private boolean released = false;
@@ -267,8 +270,8 @@ public class GameSceneActivity extends Activity implements RunningParam.GameOver
 
         fab_pause = findViewById(R.id.fab_pause);
 
-        goalDrawable = ImageViewUtils.getGoalDrawable(getApplicationContext(), R.array.goal_drawable);
-        goalBoomDrawable = ImageViewUtils.getGoalDrawable(getApplicationContext(), R.array.goal_boom_drawable);
+        goalDrawable = DrawableUtils.getGoalDrawable(getApplicationContext(), R.array.goal_drawable);
+        goalBoomDrawable = DrawableUtils.getGoalDrawable(getApplicationContext(), R.array.goal_boom_drawable);
     }
 
     private void initListener() {
@@ -359,7 +362,7 @@ public class GameSceneActivity extends Activity implements RunningParam.GameOver
         game_scene.addView(goalView);
 
         // 碰撞目标 设置
-        CollBoomGoal collGoal = getControlGoal().newBoomCollGoal(goalView);
+        BoomCollGoal collGoal = getControlGoal().newBoomCollGoal(goalView);
 
         BoomMoveGoalRunningParam.getInstance().start(collGoal);
 
@@ -479,6 +482,30 @@ public class GameSceneActivity extends Activity implements RunningParam.GameOver
 
         // 碰撞目标 设置
         CollGoal collGoal = getControlGoal().newCollGoal(goalView);
+
+        Logger.i(TAG, "createCollGoal()------目标生成:" + collGoal.getName() + "  " + goalView.getX() + " - " + goalView.getY());
+    }
+
+    /**
+     * 生成道具
+     */
+    private void createPropCollGoal() {
+        Logger.i(TAG, "当前目标类型: 道具");
+
+        // 目标图片
+        ImageView goalView = new ImageView(this);
+        goalView.setImageResource(R.drawable.shetou);
+        goalView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        goalView.setX(random.nextInt(GameData.SCENE_WIDTH - GameData.GOAL_WIDTH_HEIGHT + 1));
+        goalView.setY(random.nextInt(GameData.SCENE_HEIGHT - GameData.GOAL_WIDTH_HEIGHT + 1));
+
+        goalView.setLayoutParams(new ConstraintLayout.LayoutParams(GameData.GOAL_WIDTH_HEIGHT, GameData.GOAL_WIDTH_HEIGHT));
+
+        // 往容器添加view
+        game_scene.addView(goalView);
+
+        // 碰撞目标 设置
+        PropCollGoal collGoal = getControlGoal().newPropCollGoal(goalView);
 
         Logger.i(TAG, "createCollGoal()------目标生成:" + collGoal.getName() + "  " + goalView.getX() + " - " + goalView.getY());
     }
@@ -758,16 +785,33 @@ public class GameSceneActivity extends Activity implements RunningParam.GameOver
      *
      * @return
      */
-    public List<CollBoomGoal> getCollBoomGoals() {
-        List<CollBoomGoal> collBoomGoals = new ArrayList<>();
+    public List<BoomCollGoal> getBoomCollGoals() {
+        List<BoomCollGoal> collBoomGoals = new ArrayList<>();
 
         List<CollGoal> collGoals = getControlGoal().getCollGoals();
         for (CollGoal collGoal : collGoals) {
             if (collGoal.isBoom() && !collGoal.isOver()) {
-                collBoomGoals.add((CollBoomGoal) collGoal);
+                collBoomGoals.add((BoomCollGoal) collGoal);
             }
         }
         return collBoomGoals;
+    }
+
+    /**
+     * 获取场景道具列表
+     *
+     * @return
+     */
+    public List<PropCollGoal> getPropCollGoals() {
+        List<PropCollGoal> propCollGoals = new ArrayList<>();
+
+        List<CollGoal> collGoals = getControlGoal().getCollGoals();
+        for (CollGoal collGoal : collGoals) {
+            if (collGoal.isProp() && !collGoal.isOver()) {
+                propCollGoals.add((PropCollGoal) collGoal);
+            }
+        }
+        return propCollGoals;
     }
 
     @Override
@@ -783,8 +827,135 @@ public class GameSceneActivity extends Activity implements RunningParam.GameOver
             ThreadManager.getInstance().addThread(thread);
             thread.start();
         }
+
+        if (eatGoalCount == 10) {
+            // 道具生成机制开启
+            PropGoalRefreshThread thread = new PropGoalRefreshThread();
+            ThreadManager.getInstance().addThread(thread);
+            thread.start();
+        }
     }
 
+
+
+    @Override
+    public void propColl(CollGoal collGoal) {
+        // 道具碰撞
+        // 蛇头变样
+        // TODO: 2021/1/21
+        collSnackHead.setCurProps(collSnackHead.getCurProps() + 1);
+
+        Logger.i(TAG, "吃到道具");
+        // 移除图片动画
+        ImageView view = collGoal.getView();
+        Animation animation = view.getAnimation();
+        if (animation != null) {
+            animation.cancel();
+            view.clearAnimation();
+            animation = null;
+        }
+
+        //动画效果参数直接定义
+        Animation animation2 = new AlphaAnimation(1.0f, 0.1f);
+        animation2.setDuration(200);
+        animation2.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                view.setAnimation(null);
+                game_scene.removeView(view);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        view.startAnimation(animation2);
+    }
+
+    @Override
+    public void propCollBoom(CollGoal collGoal) {
+        // 有道具去碰撞炸弹
+        Logger.i(TAG, "有道具去碰撞炸弹");
+
+        // 道具只能用一次哈
+        collSnackHead.setCurProps(0);
+
+        // 移除图片动画
+        ImageView view = collGoal.getView();
+        Animation animation = view.getAnimation();
+        if (animation != null) {
+            animation.cancel();
+            view.clearAnimation();
+            animation = null;
+        }
+
+        //动画效果参数直接定义
+        Animation animation2 = new AlphaAnimation(1.0f, 0.1f);
+        animation2.setDuration(200);
+        animation2.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                view.setAnimation(null);
+                game_scene.removeView(view);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        view.startAnimation(animation2);
+    }
+
+    /**
+     * 道具生成线程
+     */
+    private class PropGoalRefreshThread extends Thread {
+        @Override
+        public void run() {
+            try {
+                while (mRunningParam != null && mRunningParam.isRunning) {
+                    if (mRunningParam.gameStatus != GameData.STATUS_RUNNING) {
+                        continue;
+                    }
+
+                    List<PropCollGoal> collPropGoals = getPropCollGoals();
+
+                    if (collPropGoals.size() == 0) {
+                        // 4分之1几率生成道具
+                        if (random.nextInt(4) == 3) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    createPropCollGoal();
+                                }
+                            });
+                        }
+                    }
+
+                    Thread.sleep(1000);
+                }
+            } catch (InterruptedException e) {
+                Logger.w(TAG, "道具生成线程中断");
+            }
+        }
+    }
+
+
+    /**
+     * 炸弹生成线程
+      */
     private class BoomGoalRefreshThread extends Thread {
         @Override
         public void run() {
@@ -794,7 +965,7 @@ public class GameSceneActivity extends Activity implements RunningParam.GameOver
                         continue;
                     }
 
-                    List<CollBoomGoal> collBoomGoals = getCollBoomGoals();
+                    List<BoomCollGoal> collBoomGoals = getBoomCollGoals();
                     // 判断条件,场景上同时存在的炸弹
                     if (collBoomGoals.size() == 0) {
                         runOnUiThread(new Runnable() {
@@ -843,19 +1014,16 @@ public class GameSceneActivity extends Activity implements RunningParam.GameOver
         animation2.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
-                Logger.e("onAnimationStart");
             }
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                Logger.e("onAnimationEnd");
                 view.setAnimation(null);
                 game_scene.removeView(view);
             }
 
             @Override
             public void onAnimationRepeat(Animation animation) {
-                Logger.e("onAnimationRepeat");
             }
         });
         view.startAnimation(animation2);

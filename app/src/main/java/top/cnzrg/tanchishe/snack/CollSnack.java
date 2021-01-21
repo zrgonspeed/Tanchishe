@@ -6,12 +6,21 @@ import android.widget.ImageView;
 import top.cnzrg.tanchishe.ICollision;
 
 public class CollSnack implements ICollision {
+    private int curProps = 0;
 
     public float lastX;
     public float lastY;
     private Snack snack;
     private ImageView view;
     private Rect rect;
+
+    public int getCurProps() {
+        return curProps;
+    }
+
+    public void setCurProps(int curProps) {
+        this.curProps = curProps;
+    }
 
     public Snack getSnack() {
         return snack;
