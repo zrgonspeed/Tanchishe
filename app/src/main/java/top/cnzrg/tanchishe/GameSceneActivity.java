@@ -22,6 +22,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.List;
 
 import top.cnzrg.tanchishe.goal.CollGoal;
@@ -342,6 +343,8 @@ public class GameSceneActivity extends Activity implements RunningParam.GameOver
     private SecureRandom random = new SecureRandom();
 
     private void createBoomMoveCollGoal() {
+        Logger.i(TAG, "当前目标类型: 移动炸弹");
+
         //------------------------移动BoomGoal
         // 目标图片
         ImageView goalView = new ImageView(this);
@@ -364,6 +367,8 @@ public class GameSceneActivity extends Activity implements RunningParam.GameOver
     }
 
     private void createMoveCollGoal() {
+        Logger.i(TAG, "当前目标类型: 移动");
+
         //------------------------移动goal
         // 目标图片
         ImageView goalView = new ImageView(this);
@@ -387,6 +392,8 @@ public class GameSceneActivity extends Activity implements RunningParam.GameOver
 
 
     private void createShanXianCollGoal() {
+        Logger.i(TAG, "当前目标类型: 闪现");
+
         // 闪现---------------------------------
         ShanXianGoalView shanXianGoalView = new ShanXianGoalView(this);
         shanXianGoalView.setImageResource(goalDrawable[random.nextInt(8)]);
@@ -409,6 +416,8 @@ public class GameSceneActivity extends Activity implements RunningParam.GameOver
     }
 
     private void createBigCollGoal() {
+        Logger.i(TAG, "当前目标类型: 大宝贝");
+
         // 大图片----------------------------------
         BigBabyGoalView bigBabyGoalView = new BigBabyGoalView(this);
         bigBabyGoalView.setImageResource(goalDrawable[random.nextInt(8)]);
@@ -433,7 +442,7 @@ public class GameSceneActivity extends Activity implements RunningParam.GameOver
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                if (collGoal.isOver()) {
+                if (collGoal.isOver() || mRunningParam == null) {
                     return;
                 }
                 game_scene.removeView(bigBabyGoalView);
@@ -453,6 +462,8 @@ public class GameSceneActivity extends Activity implements RunningParam.GameOver
 
 
     private void createNormalCollGoal() {
+        Logger.i(TAG, "当前目标类型: 普通");
+
         //------------------------常规goal
         // 目标图片
         ImageView goalView = new ImageView(this);
@@ -474,32 +485,27 @@ public class GameSceneActivity extends Activity implements RunningParam.GameOver
 
     private void createCollGoal() {
         // TODO: 2021/1/19
-        mRunningParam.goalMode = random.nextInt(5);
+        mRunningParam.goalMode = random.nextInt(4);
 
         if (mRunningParam.goalMode == 0) {
             createNormalCollGoal();
-            Logger.i(TAG, "当前目标类型: 普通");
         }
 
         if (mRunningParam.goalMode == 1) {
             createBigCollGoal();
-            Logger.i(TAG, "当前目标类型: 大宝贝");
         }
 
         if (mRunningParam.goalMode == 2) {
             createShanXianCollGoal();
-            Logger.i(TAG, "当前目标类型: 闪现");
         }
 
         if (mRunningParam.goalMode == 3) {
             createMoveCollGoal();
-            Logger.i(TAG, "当前目标类型: 移动");
         }
 
-        if (mRunningParam.goalMode == 4) {
-            createBoomMoveCollGoal();
-            Logger.i(TAG, "当前目标类型: 移动炸弹");
-        }
+//        if (mRunningParam.goalMode == 4) {
+//            createBoomMoveCollGoal();
+//        }
     }
 
     private void initControlSnack() {
@@ -747,11 +753,64 @@ public class GameSceneActivity extends Activity implements RunningParam.GameOver
 
     }
 
+    /**
+     * 获取场景炸弹列表
+     *
+     * @return
+     */
+    public List<CollBoomGoal> getCollBoomGoals() {
+        List<CollBoomGoal> collBoomGoals = new ArrayList<>();
+
+        List<CollGoal> collGoals = getControlGoal().getCollGoals();
+        for (CollGoal collGoal : collGoals) {
+            if (collGoal.isBoom() && !collGoal.isOver()) {
+                collBoomGoals.add((CollBoomGoal) collGoal);
+            }
+        }
+        return collBoomGoals;
+    }
+
     @Override
     public void collisionAfter() {
         // 吃到目标后，数据刷新
         int eatGoalCount = mRunningParam.getEatGoalCount();
         tv_eatCount.setText("" + eatGoalCount);
+
+        // 目标逐渐增多
+        if (eatGoalCount == 5) {
+            // 炸弹生成机制开启
+            BoomGoalRefreshThread thread = new BoomGoalRefreshThread();
+            ThreadManager.getInstance().addThread(thread);
+            thread.start();
+        }
+    }
+
+    private class BoomGoalRefreshThread extends Thread {
+        @Override
+        public void run() {
+            try {
+                while (mRunningParam != null && mRunningParam.isRunning) {
+                    if (mRunningParam.gameStatus != GameData.STATUS_RUNNING) {
+                        continue;
+                    }
+
+                    List<CollBoomGoal> collBoomGoals = getCollBoomGoals();
+                    // 判断条件,场景上同时存在的炸弹
+                    if (collBoomGoals.size() == 0) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                createBoomMoveCollGoal();
+                            }
+                        });
+                    }
+
+                    Thread.sleep(1000);
+                }
+            } catch (InterruptedException e) {
+                Logger.w(TAG, "炸弹生成线程中断");
+            }
+        }
     }
 
     @Override
@@ -777,7 +836,7 @@ public class GameSceneActivity extends Activity implements RunningParam.GameOver
             animation = null;
         }
 
-        //动画效果参数直接定义
+        //动画效果: 炸弹一闪一闪
         Animation animation2 = new AlphaAnimation(1.0f, 0.3f);
         animation2.setDuration(700);
         animation2.setRepeatCount(Animation.INFINITE);
