@@ -4,9 +4,11 @@ package top.cnzrg.tanchishe;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
+import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.View;
@@ -20,6 +22,7 @@ import android.widget.Toast;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.imageview.ShapeableImageView;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -52,7 +55,7 @@ public class GameSceneActivity extends Activity implements RunningParam.PropColl
     private ControlSnack controlSnack;
     private ControlGoal controlGoal;
 
-    private SnackHeadImageView snack_head;
+    private ShapeableImageView snack_head;
 
     private FloatingActionButton dire_up;
     private FloatingActionButton dire_right;
@@ -258,8 +261,8 @@ public class GameSceneActivity extends Activity implements RunningParam.PropColl
 
         snack_head = findViewById(R.id.snack_head);
         // 动态设置蛇头，有圆角边框
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.shetou);
-        snack_head.setImageBitmap(bitmap);
+//        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.shetou);
+//        snack_head.setImageBitmap(bitmap);
 
         dire_up = findViewById(R.id.dire_up);
         dire_right = findViewById(R.id.dire_right);
@@ -340,6 +343,7 @@ public class GameSceneActivity extends Activity implements RunningParam.PropColl
         collSnackHead.setXY(300f, 300f);
 
         snack_head.setVisibility(View.VISIBLE);
+//        snack_head.setStrokeColor(ColorStateList.valueOf(R.color.black));
     }
 
     // 随机数安排
@@ -828,7 +832,7 @@ public class GameSceneActivity extends Activity implements RunningParam.PropColl
             thread.start();
         }
 
-        if (eatGoalCount == 10) {
+        if (eatGoalCount == 1) {
             // 道具生成机制开启
             PropGoalRefreshThread thread = new PropGoalRefreshThread();
             ThreadManager.getInstance().addThread(thread);
@@ -844,6 +848,7 @@ public class GameSceneActivity extends Activity implements RunningParam.PropColl
         // 蛇头变样
         // TODO: 2021/1/21
         collSnackHead.setCurProps(collSnackHead.getCurProps() + 1);
+        snack_head.setStrokeColor(ColorStateList.valueOf(Color.RED));
 
         Logger.i(TAG, "吃到道具");
         // 移除图片动画
@@ -885,6 +890,7 @@ public class GameSceneActivity extends Activity implements RunningParam.PropColl
 
         // 道具只能用一次哈
         collSnackHead.setCurProps(0);
+        snack_head.setStrokeColor(ColorStateList.valueOf(Color.BLACK));
 
         // 移除图片动画
         ImageView view = collGoal.getView();

@@ -22,18 +22,17 @@ import top.cnzrg.tanchishe.util.Logger;
 
 @SuppressLint("AppCompatCustomView")
 public class SnackHeadImageView extends ImageView {
-    private int co;
-    private int borderwidth;
+    private int co = Color.BLUE;
+    private Paint paint;
+    private int radius = 30;
+    private int border = 3;
 
     //设置颜色
-    public void setColour(int color) {
+    public void setColor(int color) {
         co = color;
     }
 
     //设置边框宽度
-    public void setBorderWidth(int width) {
-        borderwidth = width;
-    }
 
     public SnackHeadImageView(Context context) {
         super(context);
@@ -55,9 +54,6 @@ public class SnackHeadImageView extends ImageView {
         paint = new Paint();
     }
 
-    private Paint paint;
-    private int radius = 30;
-    private int border = 3;
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -74,16 +70,21 @@ public class SnackHeadImageView extends ImageView {
 //        paint.setStrokeWidth(borderwidth);
 //        canvas.drawRect(rec, paint);
         Drawable drawable = getDrawable();
+        Logger.e("1");
         if (null != drawable) {
+            Logger.e("2");
+
             Bitmap bitmap = getBitmapFromDrawable(drawable);
 //   Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
-            Bitmap b = getRoundBitmapByShader(bitmap, getWidth(), getHeight(), radius, 3);
+            Bitmap b = getRoundBitmapByShader(co, bitmap, getWidth(), getHeight(), radius, border);
             final Rect rectSrc = new Rect(0, 0, b.getWidth(), b.getHeight());
             final Rect rectDest = new Rect(0, 0, getWidth(), getHeight());
             paint.reset();
             canvas.drawBitmap(b, rectSrc, rectDest, paint);
         } else {
             super.onDraw(canvas);
+            Logger.e("3");
+
         }
     }
 
@@ -105,7 +106,7 @@ public class SnackHeadImageView extends ImageView {
         return bitmap;
     }
 
-    public static Bitmap getRoundBitmapByShader(Bitmap bitmap, int outWidth, int outHeight, int radius, int boarder) {
+    public static Bitmap getRoundBitmapByShader(int color, Bitmap bitmap, int outWidth, int outHeight, int radius, int boarder) {
         if (bitmap == null) {
             return null;
         }
@@ -134,7 +135,7 @@ public class SnackHeadImageView extends ImageView {
         if (boarder > 0) {
 //绘制boarder
             Paint boarderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-            boarderPaint.setColor(Color.BLACK);
+            boarderPaint.setColor(color);
             boarderPaint.setStyle(Paint.Style.STROKE);
             boarderPaint.setStrokeWidth(boarder);
             canvas.drawRoundRect(rect, radius, radius, boarderPaint);

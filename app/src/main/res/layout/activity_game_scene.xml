@@ -136,13 +136,16 @@
         android:layout_marginLeft="1000px"
         android:background="#000000" />-->
 
-    <top.cnzrg.tanchishe.snack.SnackHeadImageView
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/snack_head"
         android:layout_width="100px"
         android:layout_height="100px"
+        android:background="@drawable/shetou"
+        android:padding="1px"
         android:visibility="gone"
-        app:layout_editor_absoluteX="-200px"
-        app:layout_editor_absoluteY="-200px" />
+        app:shapeAppearanceOverlay="@style/roundedCornerImageStyle"
+        app:strokeColor="@color/black"
+        app:strokeWidth="3px" />
 
     <RelativeLayout
         android:layout_width="150dp"
