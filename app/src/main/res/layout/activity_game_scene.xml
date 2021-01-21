@@ -140,6 +140,7 @@
         android:id="@+id/snack_head"
         android:layout_width="100px"
         android:layout_height="100px"
+        android:visibility="gone"
         app:layout_editor_absoluteX="-200px"
         app:layout_editor_absoluteY="-200px" />
 

@@ -10,6 +10,10 @@ public class CollGoal implements ICollision {
     private Goal goal;
     private Rect rect;
 
+    public boolean isBoom() {
+        return false;
+    }
+
     public void setView(ImageView view) {
         this.view = view;
         this.rect = new Rect((int) (view.getX()), (int) (view.getY()), (int) (view.getX() + view.getWidth()), (int) (view.getY() + view.getHeight()));

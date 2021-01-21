@@ -10,4 +10,9 @@
         <item>@drawable/body7</item>
         <item>@drawable/body8</item>
     </integer-array>
+
+    <integer-array name="goal_boom_drawable">
+        <item>@drawable/boom1</item>
+        <item>@drawable/boom2</item>
+    </integer-array>
 </resources>

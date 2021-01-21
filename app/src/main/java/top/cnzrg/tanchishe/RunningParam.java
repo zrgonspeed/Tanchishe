@@ -35,6 +35,7 @@ public class RunningParam {
     private Handler mShanXianCollHandler;
 
     private int eatGoalCount = 0;
+    private GameOverCallBack mGameOverCallBack;
 
     public int getEatGoalCount() {
         return eatGoalCount;
@@ -74,6 +75,10 @@ public class RunningParam {
         void shanxian(CollGoal collGoal);
     }
 
+    interface GameOverCallBack {
+        void boomColl(CollGoal collGoal);
+    }
+
     private RunningParam() {
     }
 
@@ -108,6 +113,7 @@ public class RunningParam {
         mTurnToCallBack = null;
         mCollDetectCallBack = null;
         mShanXianCallBack = null;
+        mGameOverCallBack = null;
 
         instance = null;
     }
@@ -134,6 +140,10 @@ public class RunningParam {
 
     public void setShanXianCallBack(ShanXianCallBack mShanXianCallBack) {
         this.mShanXianCallBack = mShanXianCallBack;
+    }
+
+    public void setGameOverCallBack(GameOverCallBack callBack) {
+        mGameOverCallBack = callBack;
     }
 
     private class SnackRunThread extends Thread {
@@ -238,12 +248,15 @@ public class RunningParam {
 
                 if (collSnack.isColl(collGoal)) {
                     flag = true;
-
                     collGoal.setOver(true);
-                    // 吃到目标数计数
-                    mRunningParam.eatGoalCount++;
-                    mRunningParam.mCollDetectCallBack.collision(collGoal);
-                    mRunningParam.mCollDetectCallBack.collisionAfter();
+                    if (collGoal.isBoom()) {
+                        mRunningParam.mGameOverCallBack.boomColl(collGoal);
+                    } else {
+                        // 吃到目标数计数
+                        mRunningParam.eatGoalCount++;
+                        mRunningParam.mCollDetectCallBack.collision(collGoal);
+                        mRunningParam.mCollDetectCallBack.collisionAfter();
+                    }
                     flag = false;
                 }
             }
