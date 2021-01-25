@@ -7,10 +7,9 @@ import java.lang.ref.WeakReference;
 import java.util.List;
 
 import top.cnzrg.tanchishe.goal.CollGoal;
-import top.cnzrg.tanchishe.param.GameData;
+import top.cnzrg.tanchishe.gamedata.GameData;
 import top.cnzrg.tanchishe.snack.CollSnack;
 import top.cnzrg.tanchishe.util.Logger;
-import top.cnzrg.tanchishe.util.ThreadManager;
 
 public class RunningParam {
     private static RunningParam instance;

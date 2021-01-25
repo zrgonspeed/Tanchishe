@@ -1,4 +1,4 @@
-package top.cnzrg.tanchishe.param;
+package top.cnzrg.tanchishe.gamedata;
 
 public class Direction {
     public final static int DIRECTION_UP = 1;

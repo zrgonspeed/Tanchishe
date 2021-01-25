@@ -1,4 +1,4 @@
-package top.cnzrg.tanchishe.param;
+package top.cnzrg.tanchishe.gamedata;
 
 public class GameData {
     public static final int STATUS_RUNNING = 1;

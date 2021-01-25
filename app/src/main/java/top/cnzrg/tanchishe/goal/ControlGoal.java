@@ -8,7 +8,7 @@ import java.util.List;
 
 import top.cnzrg.tanchishe.goal.boom.BoomCollGoal;
 import top.cnzrg.tanchishe.goal.prop.PropCollGoal;
-import top.cnzrg.tanchishe.param.GameData;
+import top.cnzrg.tanchishe.gamedata.GameData;
 
 public class ControlGoal implements IControlGoal {
     private Context mContext;

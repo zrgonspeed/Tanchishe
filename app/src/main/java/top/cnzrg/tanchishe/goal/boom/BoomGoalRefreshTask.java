@@ -9,8 +9,7 @@ import java.util.List;
 
 import top.cnzrg.tanchishe.RunningParam;
 import top.cnzrg.tanchishe.goal.ControlGoal;
-import top.cnzrg.tanchishe.goal.prop.PropCollGoal;
-import top.cnzrg.tanchishe.param.GameData;
+import top.cnzrg.tanchishe.gamedata.GameData;
 import top.cnzrg.tanchishe.util.Logger;
 import top.cnzrg.tanchishe.util.ThreadManager;
 

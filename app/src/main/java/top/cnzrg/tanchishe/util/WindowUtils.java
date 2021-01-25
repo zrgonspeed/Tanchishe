@@ -9,7 +9,7 @@ import android.view.Window;
 import android.widget.RelativeLayout;
 
 import top.cnzrg.tanchishe.R;
-import top.cnzrg.tanchishe.param.GameData;
+import top.cnzrg.tanchishe.gamedata.GameData;
 
 public class WindowUtils {
     //隐藏虚拟按键，并且全屏

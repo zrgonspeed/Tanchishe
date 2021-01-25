@@ -9,8 +9,8 @@ import java.security.SecureRandom;
 
 import top.cnzrg.tanchishe.RunningParam;
 import top.cnzrg.tanchishe.goal.CollGoal;
-import top.cnzrg.tanchishe.param.Direction;
-import top.cnzrg.tanchishe.param.GameData;
+import top.cnzrg.tanchishe.gamedata.Direction;
+import top.cnzrg.tanchishe.gamedata.GameData;
 import top.cnzrg.tanchishe.util.Logger;
 import top.cnzrg.tanchishe.util.ThreadManager;
 
