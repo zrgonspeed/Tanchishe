@@ -1,4 +1,4 @@
-package top.cnzrg.tanchishe.goal.other;
+package top.cnzrg.tanchishe.goal.move;
 
 import android.os.Handler;
 import android.os.Message;

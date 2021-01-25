@@ -1,4 +1,4 @@
-package top.cnzrg.tanchishe.goal.other;
+package top.cnzrg.tanchishe.goal.boom;
 
 import top.cnzrg.tanchishe.goal.CollGoal;
 

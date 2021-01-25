@@ -6,8 +6,8 @@ import android.widget.ImageView;
 import java.util.ArrayList;
 import java.util.List;
 
-import top.cnzrg.tanchishe.goal.other.BoomCollGoal;
-import top.cnzrg.tanchishe.goal.other.PropCollGoal;
+import top.cnzrg.tanchishe.goal.boom.BoomCollGoal;
+import top.cnzrg.tanchishe.goal.prop.PropCollGoal;
 import top.cnzrg.tanchishe.param.GameData;
 
 public class ControlGoal implements IControlGoal {
@@ -101,6 +101,11 @@ public class ControlGoal implements IControlGoal {
         return collGoals;
     }
 
+    /**
+     * 创建炸弹
+     * @param view
+     * @return
+     */
     public BoomCollGoal newBoomCollGoal(ImageView view) {
         BoomCollGoal collGoal = new BoomCollGoal();
         collGoal.setGoal(createGoal());
@@ -110,6 +115,11 @@ public class ControlGoal implements IControlGoal {
         return collGoal;
     }
 
+    /**
+     * 创建道具
+     * @param view
+     * @return
+     */
     public PropCollGoal newPropCollGoal(ImageView view) {
         PropCollGoal collGoal = new PropCollGoal();
         collGoal.setGoal(createGoal());
@@ -117,5 +127,39 @@ public class ControlGoal implements IControlGoal {
 
         collGoals.add(collGoal);
         return collGoal;
+    }
+
+    /**
+     * 获取场景道具列表
+     *
+     * @return
+     */
+    public List<PropCollGoal> getPropCollGoals() {
+        List<PropCollGoal> propCollGoals = new ArrayList<>();
+
+        List<CollGoal> collGoals = getCollGoals();
+        for (CollGoal collGoal : collGoals) {
+            if (collGoal.isProp() && !collGoal.isOver()) {
+                propCollGoals.add((PropCollGoal) collGoal);
+            }
+        }
+        return propCollGoals;
+    }
+
+    /**
+     * 获取场景炸弹列表
+     *
+     * @return
+     */
+    public List<BoomCollGoal> getBoomCollGoals() {
+        List<BoomCollGoal> collBoomGoals = new ArrayList<>();
+
+        List<CollGoal> collGoals = getCollGoals();
+        for (CollGoal collGoal : collGoals) {
+            if (collGoal.isBoom() && !collGoal.isOver()) {
+                collBoomGoals.add((BoomCollGoal) collGoal);
+            }
+        }
+        return collBoomGoals;
     }
 }

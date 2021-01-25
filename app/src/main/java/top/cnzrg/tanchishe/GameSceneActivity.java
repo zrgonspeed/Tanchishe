@@ -6,8 +6,6 @@ import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -25,25 +23,26 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.imageview.ShapeableImageView;
 
 import java.security.SecureRandom;
-import java.util.ArrayList;
 import java.util.List;
 
 import top.cnzrg.tanchishe.goal.CollGoal;
 import top.cnzrg.tanchishe.goal.ControlGoal;
 import top.cnzrg.tanchishe.goal.IControlGoalView;
-import top.cnzrg.tanchishe.goal.other.BigBabyGoalView;
-import top.cnzrg.tanchishe.goal.other.BoomMoveGoalRunningParam;
-import top.cnzrg.tanchishe.goal.other.BoomCollGoal;
-import top.cnzrg.tanchishe.goal.other.MoveGoalRunningParam;
-import top.cnzrg.tanchishe.goal.other.PropCollGoal;
-import top.cnzrg.tanchishe.goal.other.ShanXianGoalView;
+import top.cnzrg.tanchishe.goal.bigbaby.BigBabyGoalView;
+import top.cnzrg.tanchishe.goal.boom.BoomGoalRefreshTask;
+import top.cnzrg.tanchishe.goal.boom.BoomMoveGoalRunningParam;
+import top.cnzrg.tanchishe.goal.boom.BoomCollGoal;
+import top.cnzrg.tanchishe.goal.move.MoveGoalRunningParam;
+import top.cnzrg.tanchishe.goal.prop.PropCollGoal;
+import top.cnzrg.tanchishe.goal.shanxian.ShanXianGoalRunningParam;
+import top.cnzrg.tanchishe.goal.shanxian.ShanXianGoalView;
+import top.cnzrg.tanchishe.goal.prop.PropGoalRefreshTask;
 import top.cnzrg.tanchishe.param.Direction;
 import top.cnzrg.tanchishe.param.GameData;
 import top.cnzrg.tanchishe.snack.CollSnack;
 import top.cnzrg.tanchishe.snack.ControlSnack;
 import top.cnzrg.tanchishe.snack.IControlSnackView;
 import top.cnzrg.tanchishe.snack.Snack;
-import top.cnzrg.tanchishe.snack.SnackHeadImageView;
 import top.cnzrg.tanchishe.util.DebugUtils;
 import top.cnzrg.tanchishe.util.DrawableUtils;
 import top.cnzrg.tanchishe.util.Logger;
@@ -51,7 +50,7 @@ import top.cnzrg.tanchishe.util.ThreadManager;
 import top.cnzrg.tanchishe.util.ToastUtils;
 import top.cnzrg.tanchishe.util.WindowUtils;
 
-public class GameSceneActivity extends Activity implements RunningParam.PropCollBoomCallBack, RunningParam.CollPropCallBack, RunningParam.GameOverCallBack, GameFlow, RunningParam.ShanXianCallBack, RunningParam.CollDetect, RunningParam.TurnToCallBack, IControlSnackView, IControlGoalView {
+public class GameSceneActivity extends Activity implements ShanXianGoalRunningParam.CreateShanXianCallBack, BoomGoalRefreshTask.CreateBoomCallBack, PropGoalRefreshTask.CreatePropCallBack, RunningParam.PropCollBoomCallBack, RunningParam.CollPropCallBack, RunningParam.GameOverCallBack, GameFlow, RunningParam.ShanXianCallBack, RunningParam.CollDetect, RunningParam.TurnToCallBack, IControlSnackView, IControlGoalView {
     private ControlSnack controlSnack;
     private ControlGoal controlGoal;
 
@@ -119,7 +118,6 @@ public class GameSceneActivity extends Activity implements RunningParam.PropColl
 
         mRunningParam.setTurnToCallBack(this);
         mRunningParam.setCollDetectCallBack(this);
-        mRunningParam.setShanXianCallBack(this);
         mRunningParam.setGameOverCallBack(this);
         mRunningParam.setPropCollBoomCallBack(this);
         mRunningParam.setCollPropCallBack(this);
@@ -215,8 +213,16 @@ public class GameSceneActivity extends Activity implements RunningParam.PropColl
         mRunningParam.isRunning = false;
         mRunningParam.end();
 
+        // 目标移动机制销毁
         MoveGoalRunningParam.getInstance().destory();
         BoomMoveGoalRunningParam.getInstance().destory();
+
+        // 闪现目标销毁
+        ShanXianGoalRunningParam.getInstance().destory();
+
+        // 目标生成机制销毁
+        PropGoalRefreshTask.getInstance().destory();
+        BoomGoalRefreshTask.getInstance().destory();
 
         ThreadManager.getInstance().destory();
     }
@@ -349,7 +355,7 @@ public class GameSceneActivity extends Activity implements RunningParam.PropColl
     // 随机数安排
     private SecureRandom random = new SecureRandom();
 
-    private void createBoomMoveCollGoal() {
+    public void createBoomCollGoal() {
         Logger.i(TAG, "当前目标类型: 移动炸弹");
 
         //------------------------移动BoomGoal
@@ -418,8 +424,7 @@ public class GameSceneActivity extends Activity implements RunningParam.PropColl
         Logger.i(TAG, "createCollGoal()------目标生成:" + collGoal.getName() + "  " + shanXianGoalView.getX() + " - " + shanXianGoalView.getY());
 
         // 闪现线程
-        mRunningParam.startShanXian(collGoal);
-
+        ShanXianGoalRunningParam.getInstance().start(this, collGoal);
     }
 
     private void createBigCollGoal() {
@@ -493,7 +498,7 @@ public class GameSceneActivity extends Activity implements RunningParam.PropColl
     /**
      * 生成道具
      */
-    private void createPropCollGoal() {
+    public void createPropCollGoal() {
         Logger.i(TAG, "当前目标类型: 道具");
 
         // 目标图片
@@ -784,40 +789,6 @@ public class GameSceneActivity extends Activity implements RunningParam.PropColl
 
     }
 
-    /**
-     * 获取场景炸弹列表
-     *
-     * @return
-     */
-    public List<BoomCollGoal> getBoomCollGoals() {
-        List<BoomCollGoal> collBoomGoals = new ArrayList<>();
-
-        List<CollGoal> collGoals = getControlGoal().getCollGoals();
-        for (CollGoal collGoal : collGoals) {
-            if (collGoal.isBoom() && !collGoal.isOver()) {
-                collBoomGoals.add((BoomCollGoal) collGoal);
-            }
-        }
-        return collBoomGoals;
-    }
-
-    /**
-     * 获取场景道具列表
-     *
-     * @return
-     */
-    public List<PropCollGoal> getPropCollGoals() {
-        List<PropCollGoal> propCollGoals = new ArrayList<>();
-
-        List<CollGoal> collGoals = getControlGoal().getCollGoals();
-        for (CollGoal collGoal : collGoals) {
-            if (collGoal.isProp() && !collGoal.isOver()) {
-                propCollGoals.add((PropCollGoal) collGoal);
-            }
-        }
-        return propCollGoals;
-    }
-
     @Override
     public void collisionAfter() {
         // 吃到目标后，数据刷新
@@ -827,19 +798,14 @@ public class GameSceneActivity extends Activity implements RunningParam.PropColl
         // 目标逐渐增多
         if (eatGoalCount == 5) {
             // 炸弹生成机制开启
-            BoomGoalRefreshThread thread = new BoomGoalRefreshThread();
-            ThreadManager.getInstance().addThread(thread);
-            thread.start();
+            BoomGoalRefreshTask.getInstance().start(this);
         }
 
         if (eatGoalCount == 1) {
             // 道具生成机制开启
-            PropGoalRefreshThread thread = new PropGoalRefreshThread();
-            ThreadManager.getInstance().addThread(thread);
-            thread.start();
+            PropGoalRefreshTask.getInstance().start(this);
         }
     }
-
 
 
     @Override
@@ -922,72 +888,6 @@ public class GameSceneActivity extends Activity implements RunningParam.PropColl
             }
         });
         view.startAnimation(animation2);
-    }
-
-    /**
-     * 道具生成线程
-     */
-    private class PropGoalRefreshThread extends Thread {
-        @Override
-        public void run() {
-            try {
-                while (mRunningParam != null && mRunningParam.isRunning) {
-                    if (mRunningParam.gameStatus != GameData.STATUS_RUNNING) {
-                        continue;
-                    }
-
-                    List<PropCollGoal> collPropGoals = getPropCollGoals();
-
-                    if (collPropGoals.size() == 0) {
-                        // 4分之1几率生成道具
-                        if (random.nextInt(4) == 3) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    createPropCollGoal();
-                                }
-                            });
-                        }
-                    }
-
-                    Thread.sleep(1000);
-                }
-            } catch (InterruptedException e) {
-                Logger.w(TAG, "道具生成线程中断");
-            }
-        }
-    }
-
-
-    /**
-     * 炸弹生成线程
-      */
-    private class BoomGoalRefreshThread extends Thread {
-        @Override
-        public void run() {
-            try {
-                while (mRunningParam != null && mRunningParam.isRunning) {
-                    if (mRunningParam.gameStatus != GameData.STATUS_RUNNING) {
-                        continue;
-                    }
-
-                    List<BoomCollGoal> collBoomGoals = getBoomCollGoals();
-                    // 判断条件,场景上同时存在的炸弹
-                    if (collBoomGoals.size() == 0) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                createBoomMoveCollGoal();
-                            }
-                        });
-                    }
-
-                    Thread.sleep(1000);
-                }
-            } catch (InterruptedException e) {
-                Logger.w(TAG, "炸弹生成线程中断");
-            }
-        }
     }
 
     @Override

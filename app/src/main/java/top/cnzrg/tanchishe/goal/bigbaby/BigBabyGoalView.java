@@ -1,4 +1,4 @@
-package top.cnzrg.tanchishe.goal.other;
+package top.cnzrg.tanchishe.goal.bigbaby;
 
 import android.content.Context;
 import android.util.AttributeSet;
