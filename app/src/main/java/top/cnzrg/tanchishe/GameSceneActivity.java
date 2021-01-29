@@ -39,6 +39,7 @@ import top.cnzrg.tanchishe.goal.shanxian.ShanXianGoalView;
 import top.cnzrg.tanchishe.goal.prop.PropGoalRefreshTask;
 import top.cnzrg.tanchishe.gamedata.Direction;
 import top.cnzrg.tanchishe.gamedata.GameData;
+import top.cnzrg.tanchishe.music.MusicManager;
 import top.cnzrg.tanchishe.snack.CollSnack;
 import top.cnzrg.tanchishe.snack.ControlSnack;
 import top.cnzrg.tanchishe.snack.IControlSnackView;
@@ -129,7 +130,9 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
     protected void onResume() {
         Logger.e(TAG, "onResume()-----------------------");
         // TODO: 2021/1/12
-        gameResume();
+        if (mRunningParam.gameStatus == GameData.STATUS_PAUSE) {
+            gameResume();
+        }
         super.onResume();
     }
 
@@ -138,6 +141,7 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
         Logger.e(TAG, "onPause()-----------------------");
 
         gamePause();
+        MusicManager.getInstance().hideLrc();
 
         if (isFinishing()) {
             gameQuit();
@@ -192,11 +196,14 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
     public void gamePause() {
         Logger.w(TAG, "gamePause()-----------------------");
         mRunningParam.gameStatus = GameData.STATUS_PAUSE;
+        MusicManager.getInstance().pause();
     }
 
     public void gameResume() {
         Logger.w(TAG, "gameResume()-----------------------");
         mRunningParam.gameStatus = GameData.STATUS_RUNNING;
+        MusicManager.getInstance().resume();
+        MusicManager.getInstance().showLrc();
     }
 
     @Override
@@ -224,6 +231,10 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
         PropGoalRefreshTask.getInstance().destory();
         BoomGoalRefreshTask.getInstance().destory();
 
+        // 音乐销毁
+        MusicManager.getInstance().stop();
+
+        // 线程销毁
         ThreadManager.getInstance().destory();
     }
 
@@ -330,6 +341,9 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
     }
 
     private void gameStart() {
+        // 音乐开始
+        MusicManager.getInstance().play();
+
         // 蛇的碰撞体设置
         createCollSnack();
 
