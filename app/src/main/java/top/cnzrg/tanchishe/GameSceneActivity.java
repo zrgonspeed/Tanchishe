@@ -24,21 +24,23 @@ import com.google.android.material.imageview.ShapeableImageView;
 
 import java.security.SecureRandom;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
+import top.cnzrg.tanchishe.gamedata.Direction;
+import top.cnzrg.tanchishe.gamedata.GameData;
 import top.cnzrg.tanchishe.goal.CollGoal;
 import top.cnzrg.tanchishe.goal.ControlGoal;
 import top.cnzrg.tanchishe.goal.IControlGoalView;
 import top.cnzrg.tanchishe.goal.bigbaby.BigBabyGoalView;
+import top.cnzrg.tanchishe.goal.boom.BoomCollGoal;
 import top.cnzrg.tanchishe.goal.boom.BoomGoalRefreshTask;
 import top.cnzrg.tanchishe.goal.boom.BoomMoveGoalRunningParam;
-import top.cnzrg.tanchishe.goal.boom.BoomCollGoal;
 import top.cnzrg.tanchishe.goal.move.MoveGoalRunningParam;
 import top.cnzrg.tanchishe.goal.prop.PropCollGoal;
+import top.cnzrg.tanchishe.goal.prop.PropGoalRefreshTask;
 import top.cnzrg.tanchishe.goal.shanxian.ShanXianGoalRunningParam;
 import top.cnzrg.tanchishe.goal.shanxian.ShanXianGoalView;
-import top.cnzrg.tanchishe.goal.prop.PropGoalRefreshTask;
-import top.cnzrg.tanchishe.gamedata.Direction;
-import top.cnzrg.tanchishe.gamedata.GameData;
 import top.cnzrg.tanchishe.music.MusicManager;
 import top.cnzrg.tanchishe.snack.CollSnack;
 import top.cnzrg.tanchishe.snack.ControlSnack;
@@ -168,6 +170,7 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
 
     private void release() {
         Logger.i(TAG, "释放资源");
+        randomTaskRun = false;
 
         collSnackHead = null;
         lastBody = null;
@@ -196,7 +199,10 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
     public void gamePause() {
         Logger.w(TAG, "gamePause()-----------------------");
         mRunningParam.gameStatus = GameData.STATUS_PAUSE;
-        MusicManager.getInstance().pause();
+        // 已经播放了音乐
+        if (isPlay) {
+            MusicManager.getInstance().pause();
+        }
     }
 
     public void gameResume() {
@@ -340,9 +346,10 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
         return mRunningParam.gameStatus == GameData.STATUS_RUNNING;
     }
 
+    private boolean randomTaskRun = false;
     private void gameStart() {
         // 音乐开始
-        MusicManager.getInstance().play();
+//        MusicManager.getInstance().play();
 
         // 蛇的碰撞体设置
         createCollSnack();
@@ -354,6 +361,65 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
 
         // 随机出现一个目标
         createCollGoal();
+
+        // 随机物品 ？
+
+        // 20秒后才计算生成
+        long delay = 20000;
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                int bound = 10;
+                int duile = 5;
+                long time = 2000;
+                randomTaskRun = true;
+                while (randomTaskRun) {
+                    if (mRunningParam.gameStatus != GameData.STATUS_RUNNING) {
+                        continue;
+                    }
+
+                    int i = random.nextInt(bound);
+                    if (i == duile) {
+                        // 生成随机物品
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                createRandomCollGoal();
+                            }
+                        });
+                    }
+
+                    try {
+                        Thread.sleep(time);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }, delay);
+    }
+
+    // 让音乐只播放一次
+    private boolean isPlay = false;
+
+    // 生成随机物品，可能有音乐，全明星语音。
+    private void createRandomCollGoal() {
+        int i = random.nextInt(2);
+
+        if (i == 0) {
+            // 播放音乐
+            if (!isPlay) {
+                MusicManager.getInstance().play();
+                isPlay = true;
+                i = 1;
+            }
+        }
+
+        if (i == 1) {
+            // 播放全明星语音
+            // 弹出全明星gif
+        }
     }
 
     private void createCollSnack() {
@@ -810,12 +876,12 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
         tv_eatCount.setText("" + eatGoalCount);
 
         // 目标逐渐增多
-        if (eatGoalCount == 5) {
+        if (eatGoalCount == 3) {
             // 炸弹生成机制开启
             BoomGoalRefreshTask.getInstance().start(this);
         }
 
-        if (eatGoalCount == 1) {
+        if (eatGoalCount == 5) {
             // 道具生成机制开启
             PropGoalRefreshTask.getInstance().start(this);
         }

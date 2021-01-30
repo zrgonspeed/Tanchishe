@@ -18,7 +18,7 @@ public class PropGoalRefreshTask {
     private static PropGoalRefreshTask instance;
 
     // 几分之几的几率生成道具，间隔1秒
-    private int a = 4;
+    private int a = 15;
 
     // 随机数安排
     private SecureRandom random = new SecureRandom();
@@ -69,7 +69,6 @@ public class PropGoalRefreshTask {
                     List<PropCollGoal> collPropGoals = ControlGoal.getInstance().getPropCollGoals();
 
                     if (collPropGoals.size() == 0) {
-                        // 4分之1几率生成道具
                         if (random.nextInt(a) == 3) {
                            handler.sendEmptyMessage(0);
                         }

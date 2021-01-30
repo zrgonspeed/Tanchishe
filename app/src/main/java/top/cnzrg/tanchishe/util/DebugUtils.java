@@ -10,7 +10,7 @@ import top.cnzrg.tanchishe.gamedata.GameData;
 import top.cnzrg.tanchishe.R;
 
 public class DebugUtils {
-    public static boolean debug = true;
+    public static boolean debug = false;
 
     public static void addGridLine(Context context, ViewGroup view) {
         if (!debug)

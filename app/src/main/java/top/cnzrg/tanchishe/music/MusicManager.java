@@ -48,13 +48,16 @@ public class MusicManager {
 
     public void pause() {
         status = STATUS_PAUSE;
-        mediaPlayer.pause();
+        if (mediaPlayer != null)
+            mediaPlayer.pause();
     }
 
     public void resume() {
-        status = STATUS_PLAYING;
-        if (mediaPlayer != null) {
-            mediaPlayer.start();
+        if (status == STATUS_PAUSE) {
+            if (mediaPlayer != null) {
+                status = STATUS_PLAYING;
+                mediaPlayer.start();
+            }
         }
     }
 
@@ -63,7 +66,8 @@ public class MusicManager {
         isRunning = false;
 
         // 窗口移除歌词View
-        removeViewFromWindow(lrcView);
+        if (lrcView != null)
+            removeViewFromWindow(lrcView);
 
         mediaPlayer.reset();
         mediaPlayer.release();
@@ -75,11 +79,13 @@ public class MusicManager {
     }
 
     public void hideLrc() {
-        lrcView.setVisibility(View.GONE);
+        if (lrcView != null)
+            lrcView.setVisibility(View.GONE);
     }
 
     public void showLrc() {
-        lrcView.setVisibility(View.VISIBLE);
+        if (lrcView != null)
+            lrcView.setVisibility(View.VISIBLE);
     }
 
     private static void removeViewFromWindow(View view) {
@@ -110,7 +116,7 @@ public class MusicManager {
         public void run() {
             Logger.d(TAG, "歌词runnable");
             if (status == STATUS_STOP) {
-                Logger.d(TAG, "runnable STATUS_STOP");
+                Logger.i(TAG, "runnable STATUS_STOP");
                 return;
             }
 

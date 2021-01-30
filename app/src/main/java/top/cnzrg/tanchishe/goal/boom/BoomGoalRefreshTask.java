@@ -18,7 +18,7 @@ public class BoomGoalRefreshTask {
     private static BoomGoalRefreshTask instance;
 
     // 几分之几的几率生成，间隔1秒
-    private int a = 4;
+    private int a = 10;
 
     // 随机数安排
     private SecureRandom random = new SecureRandom();
@@ -66,9 +66,9 @@ public class BoomGoalRefreshTask {
                         continue;
                     }
 
-                    List<BoomCollGoal> collPropGoals = ControlGoal.getInstance().getBoomCollGoals();
+                    List<BoomCollGoal> collBoomGoals = ControlGoal.getInstance().getBoomCollGoals();
 
-                    if (collPropGoals.size() == 0) {
+                    if (collBoomGoals.size() < 3) {
                         // 几率生成
                         if (random.nextInt(a) == 3) {
                            handler.sendEmptyMessage(0);
