@@ -12,6 +12,7 @@ import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -76,6 +77,8 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
 
     private int[] goalDrawable;
     private int[] goalBoomDrawable;
+    private View layout_gameover;
+    private Button bt_return;
 
     /**
      * 防止横屏闪退
@@ -215,6 +218,18 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
     public void gameOver() {
         if (!DebugUtils.debug) {
             gamePause();
+
+            // 游戏结束
+            // 显示悬浮框
+            layout_gameover.setVisibility(View.VISIBLE);
+
+            // 暂停按钮隐藏
+            fab_pause.setVisibility(View.GONE);
+            // 方向键隐藏
+            dire_up.setVisibility(View.GONE);
+            dire_down.setVisibility(View.GONE);
+            dire_left.setVisibility(View.GONE);
+            dire_right.setVisibility(View.GONE);
         }
         ToastUtils.showLong(getApplicationContext(), "GameOver");
     }
@@ -283,6 +298,9 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
     private void initUI() {
         game_scene = findViewById(R.id.game_scene);
 
+        layout_gameover = findViewById(R.id.layout_gameover);
+        bt_return = layout_gameover.findViewById(R.id.bt_return);
+
         snack_head = findViewById(R.id.snack_head);
         // 动态设置蛇头，有圆角边框
 //        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.shetou);
@@ -302,6 +320,13 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
     }
 
     private void initListener() {
+        bt_return.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 返回主界面
+                finish();
+            }
+        });
 
         dire_up.setOnClickListener(new View.OnClickListener() {
             @Override
