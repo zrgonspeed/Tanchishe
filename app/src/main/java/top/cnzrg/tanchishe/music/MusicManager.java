@@ -65,17 +65,18 @@ public class MusicManager {
         status = STATUS_STOP;
         isRunning = false;
 
+        if (mediaPlayer != null) {
+            mediaPlayer.reset();
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
+
         // 窗口移除歌词View
-        if (lrcView != null)
+        if (lrcView != null) {
             removeViewFromWindow(lrcView);
-
-        mediaPlayer.reset();
-        mediaPlayer.release();
-        mediaPlayer = null;
-
-        lrcView.reset();
-        lrcView = null;
-
+            lrcView.reset();
+            lrcView = null;
+        }
     }
 
     public void hideLrc() {

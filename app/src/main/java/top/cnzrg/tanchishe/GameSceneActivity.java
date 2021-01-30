@@ -35,7 +35,7 @@ import top.cnzrg.tanchishe.goal.IControlGoalView;
 import top.cnzrg.tanchishe.goal.bigbaby.BigBabyGoalView;
 import top.cnzrg.tanchishe.goal.boom.BoomCollGoal;
 import top.cnzrg.tanchishe.goal.boom.BoomGoalRefreshTask;
-import top.cnzrg.tanchishe.goal.boom.BoomMoveGoalRunningParam;
+import top.cnzrg.tanchishe.goal.boom.BoomManager;
 import top.cnzrg.tanchishe.goal.move.MoveGoalRunningParam;
 import top.cnzrg.tanchishe.goal.prop.PropCollGoal;
 import top.cnzrg.tanchishe.goal.prop.PropGoalRefreshTask;
@@ -170,7 +170,6 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
 
     private void release() {
         Logger.i(TAG, "释放资源");
-        randomTaskRun = false;
 
         collSnackHead = null;
         lastBody = null;
@@ -222,13 +221,15 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
 
     public void gameQuit() {
         Logger.w(TAG, "gameQuit()-----------------------");
+        randomTaskRun = false;
+
         mRunningParam.gameStatus = GameData.STATUS_STOP;
         mRunningParam.isRunning = false;
         mRunningParam.end();
 
         // 目标移动机制销毁
         MoveGoalRunningParam.getInstance().destory();
-        BoomMoveGoalRunningParam.getInstance().destory();
+        BoomManager.getInstance().destory();
 
         // 闪现目标销毁
         ShanXianGoalRunningParam.getInstance().destory();
@@ -454,7 +455,7 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
         // 碰撞目标 设置
         BoomCollGoal collGoal = getControlGoal().newBoomCollGoal(goalView);
 
-        BoomMoveGoalRunningParam.getInstance().start(collGoal);
+        BoomManager.getInstance().start(collGoal);
 
         Logger.i(TAG, "createCollGoal()------目标生成:" + collGoal.getName() + "  " + goalView.getX() + " - " + goalView.getY());
     }

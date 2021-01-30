@@ -14,7 +14,7 @@ import top.cnzrg.tanchishe.gamedata.GameData;
 import top.cnzrg.tanchishe.util.Logger;
 import top.cnzrg.tanchishe.util.ThreadManager;
 
-public class BoomMoveGoalRunningParam {
+public class BoomMoveGoalRunningParam implements BoomManager.IRunningParam {
     public static String TAG = "BoomMoveGoalRunningParam";
     private static BoomMoveGoalRunningParam instance;
     // 随机数安排
@@ -26,17 +26,20 @@ public class BoomMoveGoalRunningParam {
     private static int count = 0;
     private static int moveDist = 20;
     private static int moveInterval = 100;
+    private BoomMoveGoalThread moveGoalThread;
 
-    private BoomMoveGoalRunningParam() {
+    public BoomMoveGoalRunningParam(CollGoal collGoal) {
+        moveGoalThread = new BoomMoveGoalThread(collGoal);
+        ThreadManager.getInstance().addThread(moveGoalThread);
+
         moveCollHandler = new MoveCollHandler(this);
     }
 
-    public void start(CollGoal collGoal) {
-        BoomMoveGoalThread moveGoalThread = new BoomMoveGoalThread(collGoal);
-        ThreadManager.getInstance().addThread(moveGoalThread);
+    public void start() {
         moveGoalThread.start();
     }
 
+    @Override
     public void destory() {
         count = 0;
         moveCollHandler.removeCallbacksAndMessages(null);
@@ -55,7 +58,6 @@ public class BoomMoveGoalRunningParam {
 
         @Override
         public void run() {
-
             RunningParam runningParam = RunningParam.getInstance();
 
             while (!collGoal.isOver() && runningParam.isRunning) {
@@ -146,15 +148,4 @@ public class BoomMoveGoalRunningParam {
         return true;
     }
 
-    public static BoomMoveGoalRunningParam getInstance() {
-        if (instance == null) {
-            synchronized (BoomMoveGoalRunningParam.class) {
-                if (instance == null) {
-                    instance = new BoomMoveGoalRunningParam();
-                }
-            }
-        }
-
-        return instance;
-    }
 }
