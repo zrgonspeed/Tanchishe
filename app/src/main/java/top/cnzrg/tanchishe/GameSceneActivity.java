@@ -348,6 +348,7 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
     }
 
     private boolean randomTaskRun = false;
+
     private void gameStart() {
         // 音乐开始
 //        MusicManager.getInstance().play();
@@ -375,7 +376,7 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
                 int duile = 5;
                 long time = 2000;
                 randomTaskRun = true;
-                while (randomTaskRun) {
+                while (randomTaskRun && mRunningParam != null) {
                     if (mRunningParam.gameStatus != GameData.STATUS_RUNNING) {
                         continue;
                     }
@@ -604,6 +605,16 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
         // TODO: 2021/1/19
         mRunningParam.goalMode = random.nextInt(4);
 
+        if (mRunningParam.goalMode == 3) {
+            // 降低闪现出现的概率
+            if (random.nextInt(10) == 2) {
+                createShanXianCollGoal();
+                return;
+            } else {
+                mRunningParam.goalMode = random.nextInt(3);
+            }
+        }
+
         if (mRunningParam.goalMode == 0) {
             createNormalCollGoal();
         }
@@ -613,10 +624,6 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
         }
 
         if (mRunningParam.goalMode == 2) {
-            createShanXianCollGoal();
-        }
-
-        if (mRunningParam.goalMode == 3) {
             createMoveCollGoal();
         }
 
