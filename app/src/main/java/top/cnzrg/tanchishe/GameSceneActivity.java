@@ -51,6 +51,7 @@ import top.cnzrg.tanchishe.util.DebugUtils;
 import top.cnzrg.tanchishe.util.DrawableUtils;
 import top.cnzrg.tanchishe.util.Logger;
 import top.cnzrg.tanchishe.util.ThreadManager;
+import top.cnzrg.tanchishe.util.TimeUtils;
 import top.cnzrg.tanchishe.util.ToastUtils;
 import top.cnzrg.tanchishe.util.WindowUtils;
 
@@ -79,6 +80,10 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
     private int[] goalBoomDrawable;
     private View layout_gameover;
     private Button bt_return;
+    private TextView tv_fenshu;
+    private TextView tv_time;
+    private long startTime;
+    private long totalTime;
 
     /**
      * 防止横屏闪退
@@ -205,6 +210,9 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
             return;
         }
 
+        // 保存运行的时间
+        totalTime += System.currentTimeMillis() - startTime;
+
         Logger.w(TAG, "gamePause()-----------------------");
         mRunningParam.gameStatus = GameData.STATUS_PAUSE;
         // 已经播放了音乐
@@ -219,6 +227,7 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
             return;
         }
 
+        startTime = System.currentTimeMillis();
         mRunningParam.gameStatus = GameData.STATUS_RUNNING;
         MusicManager.getInstance().resume();
         MusicManager.getInstance().showLrc();
@@ -237,6 +246,10 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
             // 游戏结束
             // 显示悬浮框
             layout_gameover.setVisibility(View.VISIBLE);
+            // 分数显示
+            tv_fenshu.setText(String.valueOf(mRunningParam.getEatGoalCount()));
+            // 时间显示
+            tv_time.setText(TimeUtils.timeToString(totalTime));
 
             // 暂停按钮隐藏
             fab_pause.setVisibility(View.GONE);
@@ -315,6 +328,8 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
 
         layout_gameover = findViewById(R.id.layout_gameover);
         bt_return = layout_gameover.findViewById(R.id.bt_return);
+        tv_fenshu = layout_gameover.findViewById(R.id.tv_fenshu);
+        tv_time = layout_gameover.findViewById(R.id.tv_time);
 
         snack_head = findViewById(R.id.snack_head);
         // 动态设置蛇头，有圆角边框
@@ -439,6 +454,9 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
     }
 
     private void gameStart() {
+        // 计时
+        startTime = System.currentTimeMillis();
+
         // 音乐开始
 //        MusicManager.getInstance().play();
 
