@@ -154,6 +154,7 @@ public class MusicManager {
             mediaPlayer.reset();
             AssetFileDescriptor fileDescriptor = context.getAssets().openFd(musicFileName);
             mediaPlayer.setDataSource(fileDescriptor.getFileDescriptor(), fileDescriptor.getStartOffset(), fileDescriptor.getLength());
+            mediaPlayer.setLooping(true);
             mediaPlayer.prepareAsync();
             mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
@@ -163,15 +164,16 @@ public class MusicManager {
                     status = STATUS_PLAYING;
                     mediaPlayer.start();
                     handler.post(runnable);
-//                    mediaPlayer.seekTo(280000);
+                    //ddbug music初始进度
+                    mediaPlayer.seekTo(290000);
                 }
             });
 
             // 播放完成
             mediaPlayer.setOnCompletionListener(mp -> {
                 Logger.i("播放完了");
-                status = STATUS_STOP;
-                lrcView.setProgress(0, false);
+//                status = STATUS_STOP;
+//                lrcView.setProgress(0, false);
             });
         } catch (IOException e) {
             e.printStackTrace();

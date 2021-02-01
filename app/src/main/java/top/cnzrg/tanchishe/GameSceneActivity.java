@@ -135,9 +135,9 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
     protected void onResume() {
         Logger.e(TAG, "onResume()-----------------------");
         // TODO: 2021/1/12
-        if (mRunningParam.gameStatus == GameData.STATUS_PAUSE) {
-            gameResume();
-        }
+//        if (mRunningParam.gameStatus == GameData.STATUS_PAUSE) {
+//            gameResume();
+//        }
         super.onResume();
     }
 
@@ -173,6 +173,7 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
 
     private void release() {
         Logger.i(TAG, "释放资源");
+        closeRandomTimer();
 
         collSnackHead = null;
         lastBody = null;
@@ -199,6 +200,11 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
     }
 
     public void gamePause() {
+        // 当前是暂停状态
+        if (mRunningParam.gameStatus == GameData.STATUS_PAUSE) {
+            return;
+        }
+
         Logger.w(TAG, "gamePause()-----------------------");
         mRunningParam.gameStatus = GameData.STATUS_PAUSE;
         // 已经播放了音乐
@@ -209,15 +215,24 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
 
     public void gameResume() {
         Logger.w(TAG, "gameResume()-----------------------");
+        if (gameover) {
+            return;
+        }
+
         mRunningParam.gameStatus = GameData.STATUS_RUNNING;
         MusicManager.getInstance().resume();
         MusicManager.getInstance().showLrc();
     }
 
+    private boolean gameover = false;
+
     @Override
     public void gameOver() {
         if (!DebugUtils.debug) {
             gamePause();
+
+            // TODO: 2021/1/30 标志gameover
+            gameover = true;
 
             // 游戏结束
             // 显示悬浮框
@@ -374,6 +389,55 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
 
     private boolean randomTaskRun = false;
 
+    private Timer timer;
+    private RandomCollGoalTimerTask timerTask;
+
+    /**
+     * 关闭随机物品生成计时
+     */
+    public void closeRandomTimer() {
+        if (timerTask != null) {
+            timerTask.cancel();
+            timerTask = null;
+        }
+        if (timer != null) {
+            timer.cancel();
+            timer = null;
+        }
+    }
+
+    private class RandomCollGoalTimerTask extends TimerTask {
+        @Override
+        public void run() {
+            int bound = 10;
+            int duile = 5;
+            long time = 2000;
+            randomTaskRun = true;
+            while (randomTaskRun && mRunningParam != null) {
+                if (mRunningParam.gameStatus != GameData.STATUS_RUNNING) {
+                    continue;
+                }
+
+                int i = random.nextInt(bound);
+                if (i == duile) {
+                    // 生成随机物品
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            createRandomCollGoal();
+                        }
+                    });
+                }
+
+                try {
+                    Thread.sleep(time);
+                } catch (InterruptedException e) {
+                    Logger.w(TAG, "生成随即物品task中断");
+                }
+            }
+        }
+    }
+
     private void gameStart() {
         // 音乐开始
 //        MusicManager.getInstance().play();
@@ -390,41 +454,12 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
         createCollGoal();
 
         // 随机物品 ？
-
+        timer = new Timer();
+        timerTask = new RandomCollGoalTimerTask();
         // 20秒后才计算生成
-        long delay = 20000;
-        Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                int bound = 10;
-                int duile = 5;
-                long time = 2000;
-                randomTaskRun = true;
-                while (randomTaskRun && mRunningParam != null) {
-                    if (mRunningParam.gameStatus != GameData.STATUS_RUNNING) {
-                        continue;
-                    }
-
-                    int i = random.nextInt(bound);
-                    if (i == duile) {
-                        // 生成随机物品
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                createRandomCollGoal();
-                            }
-                        });
-                    }
-
-                    try {
-                        Thread.sleep(time);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }, delay);
+        // ddbug 随机物品:music
+        long delay = 3000;
+        timer.schedule(timerTask, delay);
     }
 
     // 让音乐只播放一次

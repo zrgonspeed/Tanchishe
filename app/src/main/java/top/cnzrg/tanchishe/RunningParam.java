@@ -5,6 +5,7 @@ import android.os.Message;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
+import java.util.Random;
 
 import top.cnzrg.tanchishe.goal.CollGoal;
 import top.cnzrg.tanchishe.gamedata.GameData;
@@ -20,7 +21,8 @@ public class RunningParam {
     private Thread collDetectThread;
     private Handler mCollHandler;
 
-    public int direction = 1;
+    // 开始时方向,随机
+    public int direction = 0;
     public int lastDire = 0;
 
     public boolean isRunning = false;
@@ -161,6 +163,9 @@ public class RunningParam {
 
         @Override
         public void run() {
+            // 随机方向
+            direction = new Random().nextInt(4) + 1;
+
             while (isRunning) {
                 if (gameStatus != GameData.STATUS_RUNNING) {
                     continue;
@@ -284,7 +289,7 @@ public class RunningParam {
         }
     }
 
-    public int goalMode = 2;
+    public int goalMode = 0;
 
     public static RunningParam getInstance() {
         if (instance == null) {

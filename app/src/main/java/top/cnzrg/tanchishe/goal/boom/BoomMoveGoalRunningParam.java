@@ -24,6 +24,7 @@ public class BoomMoveGoalRunningParam implements BoomManager.IRunningParam {
 
     private int dire = 0;
     private static int count = 0;
+    // ddbug Boom移动目标
     private static int moveDist = 20;
     private static int moveInterval = 100;
     private BoomMoveGoalThread moveGoalThread;
