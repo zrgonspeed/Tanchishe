@@ -3,52 +3,92 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:background="#90000000"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#60000000">
 
-    <ImageView
-        android:id="@+id/iv_gameover"
-        android:layout_width="300dp"
-        android:layout_height="200dp"
-        android:src="@drawable/shetou"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_center"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#00000000"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.3"
+        app:layout_constraintHeight_percent="0.8"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5" />
+        app:layout_constraintWidth_percent="0.8">
 
-    <TextView
-        android:id="@+id/tv_fenshu_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:text="分数"
-        android:textSize="40dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@id/iv_gameover"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.3" />
+        <ImageView
+            android:id="@+id/iv_gameover"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:src="@drawable/body1"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="H,16:9"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_percent="0.6" />
 
-    <TextView
-        android:id="@+id/tv_fenshu"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="28dp"
-        android:layout_marginTop="8dp"
-        android:text="22"
-        android:textSize="40dp"
-        app:layout_constraintStart_toEndOf="@+id/iv_gameover"
-        app:layout_constraintTop_toBottomOf="@+id/tv_fenshu_name" />
+        <TextView
+            android:id="@+id/tv_fenshu_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="分数:"
+            android:textSize="25dp"
+            app:layout_constraintBottom_toBottomOf="@id/cl_center"
+            app:layout_constraintStart_toEndOf="@id/iv_gameover"
+            app:layout_constraintTop_toTopOf="@id/cl_center"
+            app:layout_constraintVertical_bias="0.4" />
 
-    <Button
-        android:id="@+id/bt_return"
-        android:layout_width="200dp"
-        android:layout_height="60dp"
-        android:layout_marginBottom="44dp"
-        android:text="返回"
-        android:textSize="30dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        <TextView
+            android:id="@+id/tv_fenshu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="22"
+            android:textSize="25dp"
+            app:layout_constraintBaseline_toBaselineOf="@id/tv_fenshu_name"
+            app:layout_constraintStart_toEndOf="@+id/tv_fenshu_name" />
+
+        <TextView
+            android:id="@+id/tv_time_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="时间:"
+            android:textSize="25dp"
+            app:layout_constraintBottom_toBottomOf="@id/cl_center"
+            app:layout_constraintStart_toEndOf="@id/iv_gameover"
+            app:layout_constraintTop_toTopOf="@id/cl_center"
+            app:layout_constraintVertical_bias="0.6" />
+
+        <TextView
+            android:id="@+id/tv_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="00:16"
+            android:textSize="25dp"
+            app:layout_constraintBaseline_toBaselineOf="@id/tv_time_name"
+            app:layout_constraintStart_toEndOf="@+id/tv_time_name" />
+
+        <Button
+            android:id="@+id/bt_return"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:text="返回"
+            android:textSize="25dp"
+            app:layout_constraintTop_toBottomOf="@id/iv_gameover"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintWidth_percent="0.2"
+            android:layout_marginTop="15dp"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -11,7 +11,7 @@ import top.cnzrg.tanchishe.R;
 
 public class DebugUtils {
     // ddbug
-    public static boolean debug = true;
+    public static boolean debug = false;
 
     public static void addGridLine(Context context, ViewGroup view) {
         if (!debug)
