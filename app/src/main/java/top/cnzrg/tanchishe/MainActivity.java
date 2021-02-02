@@ -8,16 +8,16 @@ import android.widget.Button;
 import androidx.annotation.Nullable;
 
 import top.cnzrg.tanchishe.util.Logger;
+import top.cnzrg.tanchishe.util.VersionUtils;
 
 public class MainActivity extends BaseActivity {
-    private String TAG;
+    private String TAG = this.getClass().getSimpleName();
     private boolean released = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        TAG = getClass().getSimpleName();
         Logger.e(TAG, "onCreate()-----------------------");
     }
 
@@ -34,6 +34,7 @@ public class MainActivity extends BaseActivity {
             }
         });
 
+        Logger.e(TAG, "版本号:" + VersionUtils.getAppVersionName(getApplicationContext()));
     }
 
     @Override
