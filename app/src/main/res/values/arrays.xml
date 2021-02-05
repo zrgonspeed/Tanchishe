@@ -15,4 +15,10 @@
         <item>@drawable/boom1</item>
         <item>@drawable/boom2</item>
     </integer-array>
+
+    <!--游戏场景图-->
+    <integer-array name="game_scene_drawable">
+        <item>@drawable/boom1</item>
+        <item>@drawable/boom2</item>
+    </integer-array>
 </resources>

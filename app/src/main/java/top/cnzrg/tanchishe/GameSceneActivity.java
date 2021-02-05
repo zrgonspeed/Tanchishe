@@ -78,6 +78,8 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
 
     private int[] goalDrawable;
     private int[] goalBoomDrawable;
+    private int[] sceneDrawable;
+
     private View layout_gameover;
     private Button bt_return;
     private TextView tv_fenshu;
@@ -104,6 +106,12 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_scene);
+
+        // 场景背景列表
+        sceneDrawable = DrawableUtils.getDrawableArr(getApplicationContext(), R.array.game_scene_drawable);
+        game_scene = findViewById(R.id.game_scene);
+        // 场景背景,随机
+        game_scene.setBackground(getDrawable(sceneDrawable[random.nextInt(sceneDrawable.length)]));
 
         //隐藏虚拟按键，并且全屏
         WindowUtils.hideBottomUIMenu(getWindow());
@@ -324,7 +332,6 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
 
 
     private void initUI() {
-        game_scene = findViewById(R.id.game_scene);
 
         layout_gameover = findViewById(R.id.layout_gameover);
         bt_return = layout_gameover.findViewById(R.id.bt_return);
@@ -345,8 +352,8 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
 
         fab_pause = findViewById(R.id.fab_pause);
 
-        goalDrawable = DrawableUtils.getGoalDrawable(getApplicationContext(), R.array.goal_drawable);
-        goalBoomDrawable = DrawableUtils.getGoalDrawable(getApplicationContext(), R.array.goal_boom_drawable);
+        goalDrawable = DrawableUtils.getDrawableArr(getApplicationContext(), R.array.goal_drawable);
+        goalBoomDrawable = DrawableUtils.getDrawableArr(getApplicationContext(), R.array.goal_boom_drawable);
     }
 
     private void initListener() {

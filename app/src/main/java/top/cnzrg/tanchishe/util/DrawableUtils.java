@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 
 public class DrawableUtils {
-    public static int[] getGoalDrawable(Context context, int arrayId) {
+    public static int[] getDrawableArr(Context context, int arrayId) {
         TypedArray ar = context.getResources().obtainTypedArray(arrayId);
         int len = ar.length();
         int[] resIds = new int[len];
