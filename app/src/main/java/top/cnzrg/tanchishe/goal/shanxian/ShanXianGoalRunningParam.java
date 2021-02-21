@@ -64,6 +64,8 @@ public class ShanXianGoalRunningParam {
 
                 while (!collGoal.isOver() && runningParam != null && runningParam.isRunning) {
                     if (runningParam.gameStatus != GameData.STATUS_RUNNING) {
+                        // 防止卡死，间隔一下
+                        Thread.sleep(500);
                         continue;
                     }
 

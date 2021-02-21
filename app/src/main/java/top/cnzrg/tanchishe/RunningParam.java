@@ -167,12 +167,14 @@ public class RunningParam {
             direction = new Random().nextInt(4) + 1;
 
             while (isRunning) {
-                if (gameStatus != GameData.STATUS_RUNNING) {
-                    continue;
-                }
-
-                mRunHandler.sendEmptyMessage(direction);
                 try {
+                    if (gameStatus != GameData.STATUS_RUNNING) {
+                        // 防止卡死，间隔一下
+                        Thread.sleep(500);
+                        continue;
+                    }
+
+                    mRunHandler.sendEmptyMessage(direction);
                     Thread.sleep(GameData.SNACK_MOVE_TIME_INTERVAL);
                 } catch (InterruptedException e) {
                     Logger.w(TAG, "运行线程中断");
@@ -210,12 +212,15 @@ public class RunningParam {
         @Override
         public void run() {
             while (isRunning) {
-                if (gameStatus != GameData.STATUS_RUNNING) {
-                    continue;
-                }
-
-                mCollHandler.sendEmptyMessage(0);
                 try {
+                    if (gameStatus != GameData.STATUS_RUNNING) {
+                        // 防止卡死，间隔一下
+                        Thread.sleep(500);
+                        continue;
+                    }
+
+                    mCollHandler.sendEmptyMessage(0);
+
                     Thread.sleep(GameData.COLL_GOAL_TIME_INTERVAL);
                 } catch (InterruptedException e) {
                     Logger.w(TAG, "碰撞线程中断");

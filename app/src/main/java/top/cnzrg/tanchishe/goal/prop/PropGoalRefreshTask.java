@@ -63,6 +63,8 @@ public class PropGoalRefreshTask {
 
                 while (runningParam != null && runningParam.isRunning) {
                     if (runningParam.gameStatus != GameData.STATUS_RUNNING) {
+                        // 防止卡死，间隔一下
+                        Thread.sleep(500);
                         continue;
                     }
 
@@ -70,7 +72,7 @@ public class PropGoalRefreshTask {
 
                     if (collPropGoals.size() == 0) {
                         if (random.nextInt(a) == 3) {
-                           handler.sendEmptyMessage(0);
+                            handler.sendEmptyMessage(0);
                         }
                     }
 

@@ -62,13 +62,16 @@ public class BoomMoveGoalRunningParam implements BoomManager.IRunningParam {
             RunningParam runningParam = RunningParam.getInstance();
 
             while (!collGoal.isOver() && runningParam.isRunning) {
-                if (runningParam.gameStatus != GameData.STATUS_RUNNING) {
-                    continue;
-                }
-
-                dire = random.nextInt(4) + 1;
-                count = random.nextInt(10) + 3;
                 try {
+                    if (runningParam.gameStatus != GameData.STATUS_RUNNING) {
+                        // 防止卡死，间隔一下
+                        Thread.sleep(500);
+                        continue;
+                    }
+
+                    dire = random.nextInt(4) + 1;
+                    count = random.nextInt(10) + 3;
+
                     for (int i = 0; i < count; i++) {
                         Message message = new Message();
                         message.obj = collGoal;

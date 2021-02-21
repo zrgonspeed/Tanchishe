@@ -436,7 +436,10 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
             long time = 2000;
             randomTaskRun = true;
             while (randomTaskRun && mRunningParam != null) {
-                if (mRunningParam.gameStatus != GameData.STATUS_RUNNING) {
+                try {
+                    if (mRunningParam.gameStatus != GameData.STATUS_RUNNING) {
+                    // 防止卡死，间隔一下
+                    Thread.sleep(500);
                     continue;
                 }
 
@@ -451,7 +454,6 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
                     });
                 }
 
-                try {
                     Thread.sleep(time);
                 } catch (InterruptedException e) {
                     Logger.w(TAG, "生成随即物品task中断");
