@@ -32,8 +32,8 @@ import top.cnzrg.tanchishe.gamedata.Direction;
 import top.cnzrg.tanchishe.gamedata.GameData;
 import top.cnzrg.tanchishe.goal.CollGoal;
 import top.cnzrg.tanchishe.goal.ControlGoal;
+import top.cnzrg.tanchishe.goal.GoalViewCreator;
 import top.cnzrg.tanchishe.goal.IControlGoalView;
-import top.cnzrg.tanchishe.goal.bigbaby.BigBabyGoalView;
 import top.cnzrg.tanchishe.goal.boom.BoomCollGoal;
 import top.cnzrg.tanchishe.goal.boom.BoomGoalRefreshTask;
 import top.cnzrg.tanchishe.goal.boom.BoomManager;
@@ -41,7 +41,6 @@ import top.cnzrg.tanchishe.goal.move.MoveGoalRunningParam;
 import top.cnzrg.tanchishe.goal.prop.PropCollGoal;
 import top.cnzrg.tanchishe.goal.prop.PropGoalRefreshTask;
 import top.cnzrg.tanchishe.goal.shanxian.ShanXianGoalRunningParam;
-import top.cnzrg.tanchishe.goal.shanxian.ShanXianGoalView;
 import top.cnzrg.tanchishe.music.MusicManager;
 import top.cnzrg.tanchishe.snack.CollSnack;
 import top.cnzrg.tanchishe.snack.ControlSnack;
@@ -102,6 +101,7 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
         }
     }
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,6 +112,31 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
         game_scene = findViewById(R.id.game_scene);
         // 场景背景,随机
         game_scene.setBackground(getDrawable(sceneDrawable[random.nextInt(sceneDrawable.length)]));
+
+        // 设置网络图片
+
+        /*new Thread(new Runnable() {
+            @Override
+            public void run() {
+                URL picUrl = null;
+                try {
+                    picUrl = new URL("https://cn.bing.com/th?id=ABT79DE89034A255DCBD16CBF975B1602C178F3B23C83550C0FE61C632A2C0E4ED5&w=608&h=200&c=2&rs=1&o=6&pid=SANGAM");
+                    Bitmap pngBM = BitmapFactory.decodeStream(picUrl.openStream());
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ImageView mapIMG = new ImageView(GameSceneActivity.this);
+                            mapIMG.setImageBitmap(pngBM);
+
+                            game_scene.setBackground(mapIMG.getDrawable());
+                        }
+                    });
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();*/
 
         //隐藏虚拟按键，并且全屏
         WindowUtils.hideBottomUIMenu(getWindow());
@@ -438,21 +463,21 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
             while (randomTaskRun && mRunningParam != null) {
                 try {
                     if (mRunningParam.gameStatus != GameData.STATUS_RUNNING) {
-                    // 防止卡死，间隔一下
-                    Thread.sleep(500);
-                    continue;
-                }
+                        // 防止卡死，间隔一下
+                        Thread.sleep(500);
+                        continue;
+                    }
 
-                int i = random.nextInt(bound);
-                if (i == duile) {
-                    // 生成随机物品
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            createRandomCollGoal();
-                        }
-                    });
-                }
+                    int i = random.nextInt(bound);
+                    if (i == duile) {
+                        // 生成随机物品
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                createRandomCollGoal();
+                            }
+                        });
+                    }
 
                     Thread.sleep(time);
                 } catch (InterruptedException e) {
@@ -529,13 +554,7 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
 
         //------------------------移动BoomGoal
         // 目标图片
-        ImageView goalView = new ImageView(this);
-        goalView.setImageResource(goalBoomDrawable[random.nextInt(goalBoomDrawable.length)]);
-        goalView.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        goalView.setX(random.nextInt(GameData.SCENE_WIDTH - GameData.GOAL_WIDTH_HEIGHT + 1));
-        goalView.setY(random.nextInt(GameData.SCENE_HEIGHT - GameData.GOAL_WIDTH_HEIGHT + 1));
-
-        goalView.setLayoutParams(new ConstraintLayout.LayoutParams(GameData.GOAL_WIDTH_HEIGHT, GameData.GOAL_WIDTH_HEIGHT));
+        ImageView goalView = (ImageView) GoalViewCreator.createView(this, goalBoomDrawable);
 
         // 往容器添加view
         game_scene.addView(goalView);
@@ -553,12 +572,9 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
 
         //------------------------移动goal
         // 目标图片
-        ImageView goalView = new ImageView(this);
-        goalView.setImageResource(goalDrawable[random.nextInt(8)]);
-        goalView.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        goalView.setX(random.nextInt(GameData.SCENE_WIDTH - GameData.GOAL_WIDTH_HEIGHT + 1));
-        goalView.setY(random.nextInt(GameData.SCENE_HEIGHT - GameData.GOAL_WIDTH_HEIGHT + 1));
+        ImageView goalView = (ImageView) GoalViewCreator.createView(this, goalDrawable);
 
+        // 移动目标的宽高
         goalView.setLayoutParams(new ConstraintLayout.LayoutParams(GameData.GOAL_MOVE_WIDTH_HEIGHT, GameData.GOAL_MOVE_WIDTH_HEIGHT));
 
         // 往容器添加view
@@ -577,14 +593,10 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
         Logger.i(TAG, "当前目标类型: 闪现");
 
         // 闪现---------------------------------
-        ShanXianGoalView shanXianGoalView = new ShanXianGoalView(this);
-        shanXianGoalView.setImageResource(goalDrawable[random.nextInt(8)]);
-        shanXianGoalView.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        // 设为负数表示不在屏幕上显示，避免一开始出现在屏幕上突然闪到下个左边
+        ImageView shanXianGoalView = (ImageView) GoalViewCreator.createView(this, goalDrawable);
+
         shanXianGoalView.setX(-200);
         shanXianGoalView.setY(-200);
-        shanXianGoalView.setLayoutParams(new ConstraintLayout.LayoutParams(GameData.GOAL_WIDTH_HEIGHT, GameData.GOAL_WIDTH_HEIGHT));
-
         game_scene.addView(shanXianGoalView);
 
         // 碰撞目标 设置
@@ -600,13 +612,9 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
         Logger.i(TAG, "当前目标类型: 大宝贝");
 
         // 大图片----------------------------------
-        BigBabyGoalView bigBabyGoalView = new BigBabyGoalView(this);
-        bigBabyGoalView.setImageResource(goalDrawable[random.nextInt(8)]);
-        bigBabyGoalView.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        bigBabyGoalView.setX(random.nextInt(GameData.SCENE_WIDTH - GameData.GOAL_WIDTH_HEIGHT + 1));
-        bigBabyGoalView.setY(random.nextInt(GameData.SCENE_HEIGHT - GameData.GOAL_WIDTH_HEIGHT + 1));
+        ImageView bigBabyGoalView = (ImageView) GoalViewCreator.createView(this, goalDrawable);
+        // 大图片的宽高
         bigBabyGoalView.setLayoutParams(new ConstraintLayout.LayoutParams(GameData.GOAL_BIG_WIDTH_HEIGHT, GameData.GOAL_BIG_WIDTH_HEIGHT));
-
         game_scene.addView(bigBabyGoalView);
 
         // 碰撞目标 设置
@@ -647,13 +655,7 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
 
         //------------------------常规goal
         // 目标图片
-        ImageView goalView = new ImageView(this);
-        goalView.setImageResource(goalDrawable[random.nextInt(8)]);
-        goalView.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        goalView.setX(random.nextInt(GameData.SCENE_WIDTH - GameData.GOAL_WIDTH_HEIGHT + 1));
-        goalView.setY(random.nextInt(GameData.SCENE_HEIGHT - GameData.GOAL_WIDTH_HEIGHT + 1));
-
-        goalView.setLayoutParams(new ConstraintLayout.LayoutParams(GameData.GOAL_WIDTH_HEIGHT, GameData.GOAL_WIDTH_HEIGHT));
+        ImageView goalView = (ImageView) GoalViewCreator.createView(this, goalDrawable);
 
         // 往容器添加view
         game_scene.addView(goalView);
@@ -671,13 +673,7 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
         Logger.i(TAG, "当前目标类型: 道具");
 
         // 目标图片
-        ImageView goalView = new ImageView(this);
-        goalView.setImageResource(R.drawable.shetou);
-        goalView.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        goalView.setX(random.nextInt(GameData.SCENE_WIDTH - GameData.GOAL_WIDTH_HEIGHT + 1));
-        goalView.setY(random.nextInt(GameData.SCENE_HEIGHT - GameData.GOAL_WIDTH_HEIGHT + 1));
-
-        goalView.setLayoutParams(new ConstraintLayout.LayoutParams(GameData.GOAL_WIDTH_HEIGHT, GameData.GOAL_WIDTH_HEIGHT));
+        ImageView goalView = (ImageView) GoalViewCreator.createView(this, R.drawable.shetou);
 
         // 往容器添加view
         game_scene.addView(goalView);
