@@ -5,6 +5,7 @@ public class GameData {
     public static final int STATUS_PAUSE = 2;
     public static final int STATUS_STOP = 3;
 
+    public static int dpi = 0;
 
     public static int GOAL_COUNT = 0;
     public static int SCENE_HEIGHT = 0;
@@ -24,6 +25,6 @@ public class GameData {
     public static int GOAL_BIG_WIDTH_HEIGHT = 300;
 
     // 移动目标的大小
-    public static final int GOAL_MOVE_WIDTH_HEIGHT = 60;
+    public static int GOAL_MOVE_WIDTH_HEIGHT = 60;
 
 }

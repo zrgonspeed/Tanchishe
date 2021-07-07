@@ -1,6 +1,7 @@
 package top.cnzrg.tanchishe.music.lrc;
 
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -51,7 +52,7 @@ public class LrcView extends View {
     // 自动滚动每一行歌词的持续时长
     private static final int DURATION_SCROLL_LRC = 500;
     // 歌词最大宽度，单位px
-    private static final int LRC_MAX_WIDTH = 680;
+    private static final int LRC_MAX_WIDTH = 1280;
     // 延迟消失indicator的时间，ms
     private static final int DELAY_HIDE_DURATION = 3000;
 
@@ -103,7 +104,9 @@ public class LrcView extends View {
     private int besideHighloghtColor = DEFAULT_COLOR_BESIDE_HIGHLIGHT_LRC;
     private float besideHighlightTextSize = 28;
     private int normalTextColor = DEFAULT_COLOR_FOR_OTHER_LRC;
-    private float normalTextSize = 27;
+
+    // 字体大小，单位dp
+    private float normalTextSize_dp = 25;
     private int progressColor = DEFAULT_COLOR_FOR_PROGRESS;
     private float progressTextSize = 16;
     // 用于高亮歌词的渐变色
@@ -112,7 +115,7 @@ public class LrcView extends View {
     // 垂直方向上的padding
     private int padding = 25;
     // 每行歌词的高度
-    private float eachLineHeight = normalTextSize + padding;
+    private float eachLineHeight;
 
     // 用于控制indicator的显示逻辑
     Runnable hideIndicatorRunnable = new Runnable() {
@@ -151,7 +154,14 @@ public class LrcView extends View {
 
         normalTextPaint = new Paint();
         normalTextPaint.setColor(normalTextColor);
-        normalTextPaint.setTextSize(normalTextSize);
+
+        int dpi = getResources().getDisplayMetrics().densityDpi;
+        Logger.e("dpi = " + dpi);
+        // dp 转 px
+        float size_px = normalTextSize_dp * (dpi / 160);
+        eachLineHeight = normalTextSize_dp + padding;
+
+        normalTextPaint.setTextSize(size_px);
         normalTextPaint.setAntiAlias(true);
 
         timelinePaint = new Paint();
@@ -284,6 +294,8 @@ public class LrcView extends View {
 
         canvas.save();
         float textWidth = normalTextPaint.measureText(text);
+        Logger.e("textWidth " + textWidth);
+        Logger.e("getWidth() " + getWidth());
         float x = (getWidth() - textWidth) / 2;
 
         canvas.drawText(text, x, y, normalTextPaint);
@@ -734,6 +746,7 @@ public class LrcView extends View {
      */
     public void loadLrc(String lrcStr) {
         new AsyncTask<String, Integer, List<LrcRow>>() {
+            @SuppressLint("StaticFieldLeak")
             @Override
             protected List<LrcRow> doInBackground(String... params) {
                 return LrcUtils.parseLrc(params[0]);
@@ -750,5 +763,6 @@ public class LrcView extends View {
             }
         }.execute(lrcStr);
 
+        // 输入， 输出， 处理。
     }
 }

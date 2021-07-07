@@ -106,7 +106,7 @@ public class MusicManager {
         } else {
             params.type = WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY;
         }
-        params.width = 350;
+        params.width = 600;
         params.height = 100;
         params.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
         params.format = PixelFormat.TRANSLUCENT;
@@ -170,7 +170,7 @@ public class MusicManager {
                     mediaPlayer.start();
                     handler.post(runnable);
                     //ddbug music初始进度
-                    mediaPlayer.seekTo(290000);
+                    mediaPlayer.seekTo(0);
                 }
             });
 

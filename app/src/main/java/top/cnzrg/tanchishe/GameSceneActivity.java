@@ -340,8 +340,25 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
         int width = metric.widthPixels; // 宽度（PX）
         int height = metric.heightPixels; // 高度（PX）
 
-        GameData.SCENE_HEIGHT = height / 100 * 100;
-        GameData.SCENE_WIDTH = width / 100 * 100;
+        // dpi
+        int dpi = getResources().getDisplayMetrics().densityDpi;
+        GameData.dpi = dpi;
+
+        // 横向15个
+        int w1 = width / 15;
+        int h1 = w1;
+
+        GameData.SNACK_WIDTH_HEIGHT = w1 * (dpi / 160) / 2;
+
+        GameData.SNACK_BODY_WIDTH_HEIGHT = GameData.SNACK_WIDTH_HEIGHT;
+        GameData.SNACK_MOVE_DIST_INTERVAL = GameData.SNACK_WIDTH_HEIGHT;
+        GameData.GRID_LINE_LEN = GameData.SNACK_WIDTH_HEIGHT;
+        GameData.GOAL_WIDTH_HEIGHT = GameData.SNACK_WIDTH_HEIGHT;
+        GameData.GOAL_BIG_WIDTH_HEIGHT = GameData.SNACK_WIDTH_HEIGHT * 3;
+        GameData.GOAL_MOVE_WIDTH_HEIGHT = GameData.SNACK_WIDTH_HEIGHT * 60 / 100;
+
+        GameData.SCENE_HEIGHT = height / GameData.SNACK_WIDTH_HEIGHT * GameData.SNACK_WIDTH_HEIGHT;
+        GameData.SCENE_WIDTH = width / GameData.SNACK_WIDTH_HEIGHT * GameData.SNACK_WIDTH_HEIGHT;
 
         Logger.d(TAG, "SCENE_HEIGHT " + height + ", SCENE_WIDTH " + width);
 
@@ -519,7 +536,7 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
 
     // 生成随机物品，可能有音乐，全明星语音。
     private void createRandomCollGoal() {
-        int i = random.nextInt(2);
+        int i = random.nextInt(5);
 
         if (i == 0) {
             // 播放音乐
@@ -540,8 +557,9 @@ public class GameSceneActivity extends Activity implements ShanXianGoalRunningPa
         collSnackHead = new CollSnack();
         collSnackHead.setSnack(getControlSnack().getSnack());
         collSnackHead.setView(snack_head);
-        collSnackHead.setXY(300f, 300f);
+        collSnackHead.setXY(GameData.SNACK_WIDTH_HEIGHT * 5, GameData.SNACK_WIDTH_HEIGHT * 2);
 
+        snack_head.setLayoutParams(new ConstraintLayout.LayoutParams(GameData.SNACK_WIDTH_HEIGHT, GameData.SNACK_WIDTH_HEIGHT));
         snack_head.setVisibility(View.VISIBLE);
 //        snack_head.setStrokeColor(ColorStateList.valueOf(R.color.black));
     }
